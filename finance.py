@@ -8,6 +8,14 @@ class CostEntry:
         self.cost = cost
         self.comment = comment
 
+def generate_header(sheet):
+    pass
+
+def delete_footer(sheet):
+    pass
+
+def generate_footer(sheet):
+    pass
 
 # Read data file names
 input_filenames = []
@@ -17,6 +25,9 @@ for i in range(1, len(sys.argv)-1):
 output_filename = sys.argv[-1]
 wb_output = load_workbook(output_filename)
 sheet_out = wb_output.active
+
+generate_header(sheet_out)
+delete_footer(sheet_out)
 
 for filename in input_filenames:
     # Load xlsx workbook
@@ -43,3 +54,6 @@ for filename in input_filenames:
         )
 
         r = r+1
+
+generate_footer(sheet_out)
+
