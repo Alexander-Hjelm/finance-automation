@@ -14,7 +14,7 @@ def generate_header(sheet):
 def delete_footer(sheet):
     pass
 
-def generate_footer(sheet):
+def generate_footer(sheet, offset_y):
     pass
 
 # TODO: Remove duplicate cost entries
@@ -33,6 +33,46 @@ sheet_out = wb_output.active
 generate_header(sheet_out)
 delete_footer(sheet_out)
 
+cost_entries_summed = []
+r = 7
+while sheet_out['B'+str(r)].value != None:
+
+    # Sum cost, TODO: make leaner, fix signs
+    cost = 0
+    if sheet_out['C'+str(r)].value != None:
+        cost += max(sheet_out['C'+str(r)].value, 0)
+    if sheet_out['D'+str(r)].value != None:
+        cost += max(sheet_out['D'+str(r)].value, 0)
+    if sheet_out['E'+str(r)].value != None:
+        cost += max(sheet_out['E'+str(r)].value, 0)
+    if sheet_out['F'+str(r)].value != None:
+        cost += max(sheet_out['F'+str(r)].value, 0)
+    if sheet_out['G'+str(r)].value != None:
+        cost += max(sheet_out['G'+str(r)].value, 0)
+    if sheet_out['H'+str(r)].value != None:
+        cost += max(sheet_out['H'+str(r)].value, 0)
+    if sheet_out['I'+str(r)].value != None:
+        cost += max(sheet_out['I'+str(r)].value, 0)
+    if sheet_out['J'+str(r)].value != None:
+        cost += max(sheet_out['J'+str(r)].value, 0)
+    if sheet_out['K'+str(r)].value != None:
+        cost += max(sheet_out['K'+str(r)].value, 0)
+    if sheet_out['L'+str(r)].value != None:
+        cost += max(sheet_out['L'+str(r)].value, 0)
+    if sheet_out['M'+str(r)].value != None:
+        cost += max(sheet_out['M'+str(r)].value, 0)
+    if sheet_out['N'+str(r)].value != None:
+        cost += max(sheet_out['N'+str(r)].value, 0)
+
+    # Read a specific cell
+    cost_entry = CostEntry(
+        sheet_out['B'+str(r)].value,
+        cost,
+        sheet_out['O'+str(r)].value
+    )
+    cost_entries_summed.append(cost_entry)
+    r = r+1
+
 for filename in input_filenames:
     # Load xlsx workbook
     wb_input = load_workbook(filename)
@@ -43,21 +83,26 @@ for filename in input_filenames:
 
     # Load active sheet or named sheet
     sheet_in = wb_input.active
-
     # sheet = wb['User Information']
 
     # Iterate over rows
-    r = 1
+    r = 9
     while sheet_in['A'+str(r)].value != None:
 
         # Read a specific cell
         cost_entry = CostEntry(
-            sheet_in['A'+str(r)].value,
-            sheet_in['B'+str(r)].value,
-            sheet_in['C'+str(r)].value
+            sheet_in['C'+str(r)].value,
+            sheet_in['G'+str(r)].value,
+            sheet_in['E'+str(r)].value
         )
-
+        cost_entries_summed.append(cost_entry)
         r = r+1
 
-generate_footer(sheet_out)
+for cost_entry in cost_entries_summed:
+    print("*****************")
+    print(cost_entry.comment)
+    print(cost_entry.cost)
+    print(cost_entry.datetime)
+
+generate_footer(sheet_out, 100)
 
