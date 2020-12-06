@@ -20,7 +20,52 @@ def generate_header(sheet):
     sheet["C2"].value = "Inkomster"
     sheet["D2"].value = "Konton"
     sheet["G2"].value = "Utgifter"
-    #TODO: Implement
+
+    sheet["C3"].value = "Rutin"
+    sheet["D3"].value = "E-sparkonto"
+    sheet["E3"].value = "Investerarkonto"
+    sheet["F3"].value = "Kortkonto"
+    sheet["G3"].value = "Rutin"
+    sheet["H3"].value = "Mat"
+    sheet["I3"].value = "Hushåll"
+    sheet["J3"].value = "Hobby"
+    sheet["K3"].value = "Nöje"
+    sheet["L3"].value = "Resa"
+    sheet["M3"].value = "Kläder"
+    sheet["N3"].value = "Övrigt"
+    sheet["O3"].value = "Kommentar"
+
+    #TODO: Automate accumulated budget
+    sheet["A4"].value = "Budgetering, ackumulerad från förra månaden"
+    sheet["D4"].value = 0
+    sheet["E4"].value = 0
+    sheet["G4"].value = 0
+    sheet["H4"].value = 0
+    sheet["I4"].value = 0
+    sheet["J4"].value = 0
+    sheet["K4"].value = 0
+    sheet["L4"].value = 0
+    sheet["M4"].value = 0
+    sheet["N4"].value = 0
+
+    #TODO: Sample budget from a config
+    sheet["A5"].value = "Budgetering"
+    sheet["D5"].value = 1000
+    sheet["E5"].value = 10090
+    sheet["G5"].value = 4000
+    sheet["H5"].value = 2000
+    sheet["I5"].value = 500
+    sheet["J5"].value = 500
+    sheet["K5"].value = 500
+    sheet["L5"].value = 500
+    sheet["M5"].value = 500
+    sheet["N5"].value = 500
+
+    #TODO: Fix initial balance
+    sheet["A6"].value = "Ingående balans"
+    sheet["D6"].value = 150000
+    sheet["E6"].value = 6000
+    sheet["F6"].value = 1000
 
 def clear_sheet(sheet):
     sheet_out.delete_cols(1, 1000)
