@@ -28,9 +28,20 @@ def generate_footer(sheet, offset_y):
 def put_cost_entries(sheet, cost_entries):
     i=7
     for cost_entry in cost_entries:
+        if cost_entry.comment == None:
+            print("WARNING: Found cost entry comment that was None")
+            continue
         if not cost_entry.comment in cost_type_translation_table:
             print("WARNING: Did not find comment: " + str(cost_entry.comment) + " in cost rules, please add it. Skipping for now...")
-        #sheet['']
+            continue
+
+        cost_type = cost_type_translation_table[cost_entry.comment]
+        cost_rule = cost_type_rules[cost_type]
+        from_field = cost_rule.from_field
+        to_field = cost_rule.to_field
+        cost = cost_entry.cost
+        sheet[from_field + str(i)].value = -cost
+        sheet[to_field + str(i)].value = cost
         i+=1
 
 # Config
