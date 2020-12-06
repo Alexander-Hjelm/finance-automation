@@ -1,12 +1,21 @@
 import sys
+from enum import Enum
 from openpyxl import load_workbook
 
-class CostEntry:
 
+class CostEntry:
     def __init__(self, datetime, cost, comment):
         self.datetime = datetime
         self.cost = cost
         self.comment = comment
+
+    def __eq__(self, other):
+        return self.datetime == other.datetime and self.cost == other.cost and self.comment == other.comment
+
+class CostTypeRule:
+    def __init__(self, from_field, to_field):
+        self.from_field = from_field
+        self.to_field = to_field
 
 def generate_header(sheet):
     pass
@@ -16,6 +25,50 @@ def delete_footer(sheet):
 
 def generate_footer(sheet, offset_y):
     pass
+
+def put_cost_entries(sheet, cost_entries):
+    i=7
+    for cost_entry in cost_entries:
+        sheet['']
+        i+=1
+
+# Config
+
+class CostType(Enum):
+    EXPENSE_CLOTHING=1
+    EXPENSE_FOOD=2
+    EXPENSE_FUN=3
+    EXPENSE_GIFTS=4
+    EXPENSE_HOBBY=5
+    EXPENSE_HOUSEHOLD=6
+    EXPENSE_MISC=7
+    EXPENSE_ROUTINE=8
+    EXPENSE_TRAVEL=9
+    INCOME=10
+    TRANSFER_SAVINGS_TO_CARD=11
+    TRANSFER_SAVINGS_TO_STOCK=12
+
+cost_type_rules = {
+    CostType.EXPENSE_CLOTHING: CostTypeRule('F', 'M'),
+    CostType.EXPENSE_FOOD: CostTypeRule('F', 'H'),
+    CostType.EXPENSE_FUN: CostTypeRule('F', 'K'),
+    CostType.EXPENSE_GIFTS: CostTypeRule('F', ''),
+    CostType.EXPENSE_HOBBY: CostTypeRule('F', 'J'),
+    CostType.EXPENSE_HOUSEHOLD: CostTypeRule('F', 'I'),
+    CostType.EXPENSE_MISC: CostTypeRule('F', 'N'),
+    CostType.EXPENSE_ROUTINE: CostTypeRule('F', 'G'),
+    CostType.EXPENSE_TRAVEL: CostTypeRule('F', 'L'),
+    CostType.INCOME: CostTypeRule('C', 'D'),
+    CostType.TRANSFER_SAVINGS_TO_CARD: CostTypeRule('D', 'F'),
+    CostType.TRANSFER_SAVINGS_TO_STOCK: CostTypeRule('D', 'E')
+}
+
+cost_type_translation_table = {
+    "EMMAUS": CostType.EXPENSE_CLOTHING,
+    "HEMKÖP SOLNA MAL": CostType.EXPENSE_FOOD,
+    "ICA LAPPKARRSBER": CostType.EXPENSE_FOOD,
+    "84319530719301": CostType.TRANSFER_SAVINGS_TO_CARD
+}
 
 # TODO: Generate output file
 # TODO: Month/sheet management
