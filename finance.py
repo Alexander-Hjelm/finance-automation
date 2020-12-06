@@ -17,6 +17,10 @@ def delete_footer(sheet):
 def generate_footer(sheet):
     pass
 
+# TODO: Remove duplicate cost entries
+# TODO: Generate output file
+# TODO: Month/sheet management
+
 # Read data file names
 input_filenames = []
 for i in range(1, len(sys.argv)-1):
