@@ -17,7 +17,6 @@ def delete_footer(sheet):
 def generate_footer(sheet, offset_y):
     pass
 
-# TODO: Remove duplicate cost entries
 # TODO: Generate output file
 # TODO: Month/sheet management
 
@@ -37,7 +36,7 @@ cost_entries_summed = []
 r = 7
 while sheet_out['B'+str(r)].value != None:
 
-    # Sum cost, TODO: make leaner, fix signs
+    # Sum cost, TODO: make leaner
     cost = 0
     if sheet_out['C'+str(r)].value != None:
         cost += max(sheet_out['C'+str(r)].value, 0)
@@ -92,10 +91,19 @@ for filename in input_filenames:
         # Read a specific cell
         cost_entry = CostEntry(
             sheet_in['C'+str(r)].value,
-            sheet_in['G'+str(r)].value,
+            abs(sheet_in['G'+str(r)].value),
             sheet_in['E'+str(r)].value
         )
-        cost_entries_summed.append(cost_entry)
+
+        # Duplicate check
+        duplicate_found = False
+        for cost_entry_2 in cost_entries_summed:
+            if cost_entry == cost_entry_2:
+                duplicate_found = True
+                break
+
+        if not duplicate_found:
+            cost_entries_summed.append(cost_entry)
         r = r+1
 
 for cost_entry in cost_entries_summed:
