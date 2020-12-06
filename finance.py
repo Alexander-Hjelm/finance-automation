@@ -20,13 +20,14 @@ def generate_header(sheet):
     sheet["C2"].value = "Inkomster"
     sheet["D2"].value = "Konton"
     sheet["G2"].value = "Utgifter"
+    #TODO: Implement
 
-def delete_footer(sheet):
-    pass
+def clear_sheet(sheet):
+    sheet_out.delete_cols(1, 1000)
 
 def generate_footer(sheet, offset_y):
-    sheet['C'+str(offset_y)]="SUM(C7:C"+str(offset_y-2)+")"
-    pass
+    sheet['C'+str(offset_y)]="=SUM(C7:C"+str(offset_y-2)+")"
+    #TODO: Implement
 
 def put_cost_entries(sheet, cost_entries):
     i=7
@@ -93,7 +94,6 @@ cost_type_translation_table = {
     "84319530719301": CostType.TRANSFER_SAVINGS_TO_CARD
 }
 
-# TODO: Generate output file
 # TODO: Month/sheet management
 
 # Read data file names
@@ -104,9 +104,6 @@ for i in range(1, len(sys.argv)-1):
 output_filename = sys.argv[-1]
 wb_output = load_workbook(output_filename)
 sheet_out = wb_output.active
-
-generate_header(sheet_out)
-delete_footer(sheet_out)
 
 cost_entries_summed = []
 r = 7
@@ -188,6 +185,9 @@ for cost_entry in cost_entries_summed:
     print(cost_entry.cost)
     print(cost_entry.datetime)
 
+clear_sheet(sheet_out)
+generate_header(sheet_out)
 put_cost_entries(sheet_out, cost_entries_summed)
 generate_footer(sheet_out, 100)
 
+wb_output.save(output_filename)
