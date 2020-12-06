@@ -91,6 +91,8 @@ def put_cost_entries(sheet, cost_entries):
         cost = cost_entry.cost
         sheet[from_field + str(i)].value = -cost
         sheet[to_field + str(i)].value = cost
+        sheet['B' + str(i)].value = cost_entry.datetime
+        sheet['O' + str(i)].value = cost_entry.comment
         i+=1
 
 # Config
