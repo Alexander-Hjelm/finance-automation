@@ -2,7 +2,6 @@ import sys
 from enum import Enum
 from openpyxl import load_workbook
 
-
 class CostEntry:
     def __init__(self, datetime, cost, comment):
         self.datetime = datetime
@@ -29,7 +28,9 @@ def generate_footer(sheet, offset_y):
 def put_cost_entries(sheet, cost_entries):
     i=7
     for cost_entry in cost_entries:
-        sheet['']
+        if not cost_entry.comment in cost_type_translation_table:
+            print("WARNING: Did not find comment: " + str(cost_entry.comment) + " in cost rules, please add it. Skipping for now...")
+        #sheet['']
         i+=1
 
 # Config
@@ -65,8 +66,16 @@ cost_type_rules = {
 
 cost_type_translation_table = {
     "EMMAUS": CostType.EXPENSE_CLOTHING,
+    "STADIUM DROTTNI": CostType.EXPENSE_CLOTHING,
+    "AB STORSTOCKHOL": CostType.EXPENSE_FOOD,
+    "BURGER KING ODE": CostType.EXPENSE_FOOD,
+    "HEMKÖP DJURGÅRDS": CostType.EXPENSE_FOOD,
     "HEMKÖP SOLNA MAL": CostType.EXPENSE_FOOD,
     "ICA LAPPKARRSBER": CostType.EXPENSE_FOOD,
+    "PROFESSORN RESTA": CostType.EXPENSE_FUN,
+    "CLAS OHLSON": CostType.EXPENSE_HOUSEHOLD,
+    "FOLKTANDVÅRD": CostType.EXPENSE_ROUTINE,
+    "CLAS OHLSON 218": CostType.EXPENSE_HOUSEHOLD,
     "84319530719301": CostType.TRANSFER_SAVINGS_TO_CARD
 }
 
@@ -165,5 +174,6 @@ for cost_entry in cost_entries_summed:
     print(cost_entry.cost)
     print(cost_entry.datetime)
 
+put_cost_entries(sheet_out, cost_entries_summed)
 generate_footer(sheet_out, 100)
 
