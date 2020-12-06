@@ -17,12 +17,15 @@ class CostTypeRule:
         self.to_field = to_field
 
 def generate_header(sheet):
-    pass
+    sheet["C2"].value = "Inkomster"
+    sheet["D2"].value = "Konton"
+    sheet["G2"].value = "Utgifter"
 
 def delete_footer(sheet):
     pass
 
 def generate_footer(sheet, offset_y):
+    sheet['C'+str(offset_y)]="SUM(C7:C"+str(offset_y-2)+")"
     pass
 
 def put_cost_entries(sheet, cost_entries):
