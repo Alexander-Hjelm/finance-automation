@@ -1,4 +1,5 @@
 import sys
+import string
 from enum import Enum
 from openpyxl import load_workbook
 
@@ -156,32 +157,13 @@ cost_entries_summed = []
 r = 7
 while sheet_out['B'+str(r)].value != None:
 
-    # Sum cost, TODO: make leaner
+    # Sum cost
+    alphabet = string.ascii_uppercase
+    upper_limit = 14
     cost = 0
-    if sheet_out['C'+str(r)].value != None:
-        cost += max(sheet_out['C'+str(r)].value, 0)
-    if sheet_out['D'+str(r)].value != None:
-        cost += max(sheet_out['D'+str(r)].value, 0)
-    if sheet_out['E'+str(r)].value != None:
-        cost += max(sheet_out['E'+str(r)].value, 0)
-    if sheet_out['F'+str(r)].value != None:
-        cost += max(sheet_out['F'+str(r)].value, 0)
-    if sheet_out['G'+str(r)].value != None:
-        cost += max(sheet_out['G'+str(r)].value, 0)
-    if sheet_out['H'+str(r)].value != None:
-        cost += max(sheet_out['H'+str(r)].value, 0)
-    if sheet_out['I'+str(r)].value != None:
-        cost += max(sheet_out['I'+str(r)].value, 0)
-    if sheet_out['J'+str(r)].value != None:
-        cost += max(sheet_out['J'+str(r)].value, 0)
-    if sheet_out['K'+str(r)].value != None:
-        cost += max(sheet_out['K'+str(r)].value, 0)
-    if sheet_out['L'+str(r)].value != None:
-        cost += max(sheet_out['L'+str(r)].value, 0)
-    if sheet_out['M'+str(r)].value != None:
-        cost += max(sheet_out['M'+str(r)].value, 0)
-    if sheet_out['N'+str(r)].value != None:
-        cost += max(sheet_out['N'+str(r)].value, 0)
+    for c in alphabet[2:upper_limit:1] : 
+        if sheet_out[c+str(r)].value != None:
+            cost += max(sheet_out[c+str(r)].value, 0)
 
     # Read a specific cell
     cost_entry = CostEntry(
