@@ -273,11 +273,13 @@ for month in cost_entries_summed.keys():
         print(cost_entry.cost)
         print(cost_entry.datetime)
 
-#TODO: Generate one sheet per month
 wb_output = Workbook()
-sheet_out = wb_output.active;
-generate_header(sheet_out)
-put_cost_entries(sheet_out, cost_entries_summed["2020-11"])
-generate_footer(sheet_out, 8+len(cost_entries_summed["2020-11"]))
+for month_identifier in cost_entries_summed.keys():
+    wb_output.create_sheet(month_identifier)
+    sheet_out = wb_output.get_sheet_by_name(month_identifier)
+    generate_header(sheet_out)
+    put_cost_entries(sheet_out, cost_entries_summed[month_identifier])
+    generate_footer(sheet_out, 8+len(cost_entries_summed[month_identifier]))
+wb_output.remove_sheet(wb_output.active)
 
 wb_output.save(output_filename)
