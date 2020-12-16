@@ -205,28 +205,29 @@ wb_output = load_workbook(output_filename)
 cost_entries_summed = {}
 r = 7
 
-#TODO: Collect payments for all sheets in the ouput file
-sheet_out = wb_output.active
-while sheet_out['B'+str(r)].value != None:
+# Collect payments for all sheets in the ouput file
+for sheet_name in wb_output.sheetnames:
+    sheet_out = wb_output.get_sheet_by_name(sheet_name)
+    while sheet_out['B'+str(r)].value != None:
 
-    # Sum cost
-    cost = 0
-    for c in alphabet_uppercase[2:14:1] : 
-        if sheet_out[c+str(r)].value != None:
-            cost += max(sheet_out[c+str(r)].value, 0)
+        # Sum cost
+        cost = 0
+        for c in alphabet_uppercase[2:14:1] : 
+            if sheet_out[c+str(r)].value != None:
+                cost += max(sheet_out[c+str(r)].value, 0)
 
-    # Read a specific cell
-    cost_entry = CostEntry(
-        sheet_out['B'+str(r)].value,
-        cost,
-        sheet_out['O'+str(r)].value
-    )
+        # Read a specific cell
+        cost_entry = CostEntry(
+            sheet_out['B'+str(r)].value,
+            cost,
+            sheet_out['O'+str(r)].value
+        )
 
-    month_identifier = str.rsplit(cost_entry.datetime, '-', 1)[0]
-    if not month_identifier in cost_entries_summed:
-        cost_entries_summed[month_identifier] = []
-    cost_entries_summed[month_identifier].append(cost_entry)
-    r = r+1
+        month_identifier = str.rsplit(cost_entry.datetime, '-', 1)[0]
+        if not month_identifier in cost_entries_summed:
+            cost_entries_summed[month_identifier] = []
+        cost_entries_summed[month_identifier].append(cost_entry)
+        r = r+1
 
 for filename in input_filenames:
     # Load xlsx workbook
