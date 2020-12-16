@@ -3,6 +3,8 @@ import string
 from enum import Enum
 from openpyxl import load_workbook
 
+alphabet_uppercase = string.ascii_uppercase
+
 class CostEntry:
     def __init__(self, datetime, cost, comment):
         self.datetime = datetime
@@ -72,8 +74,53 @@ def clear_sheet(sheet):
     sheet_out.delete_cols(1, 1000)
 
 def generate_footer(sheet, offset_y):
-    sheet['C'+str(offset_y)]="=SUM(C7:C"+str(offset_y-2)+")"
-    #TODO: Implement
+    sheet['B'+str(offset_y)]="Differens"
+    for c in alphabet_uppercase[2:14:1] : 
+        sheet[c+str(offset_y)]="=SUM("+c+"7:"+c+str(offset_y-2)+")"
+
+    sheet['B'+str(offset_y+1)]="Utgående saldo"
+    sheet['D'+str(offset_y+1)]="=SUM(D6,D"+str(offset_y)+")"
+    sheet['E'+str(offset_y+1)]="=SUM(E6,E"+str(offset_y)+")"
+    sheet['F'+str(offset_y+1)]="=SUM(F6,F"+str(offset_y)+")"
+
+    sheet["D"+str(offset_y+3)].value = "Sparkonto"
+    sheet["E"+str(offset_y+3)].value = "Aktiekonto"
+
+    sheet["G"+str(offset_y+3)].value = "Rutin"
+    sheet["H"+str(offset_y+3)].value = "Mat"
+    sheet["I"+str(offset_y+3)].value = "Hushåll"
+    sheet["J"+str(offset_y+3)].value = "Hobby"
+    sheet["K"+str(offset_y+3)].value = "Nöje"
+    sheet["L"+str(offset_y+3)].value = "Resa"
+    sheet["M"+str(offset_y+3)].value = "Kläder"
+    sheet["N"+str(offset_y+3)].value = "Övrigt"
+    sheet["O"+str(offset_y+3)].value = "Kommentar"
+
+    sheet["B"+str(offset_y+4)].value = "Budgetdifferens"
+    sheet["B"+str(offset_y+5)].value = "Budgetdifferens, carryover"
+    sheet["B"+str(offset_y+6)].value = "Budgetdifferens, manuella ändringar till nästa månad"
+    sheet["B"+str(offset_y+7)].value = "Budget, ackumulerad nästa månad"
+
+    sheet['D'+str(offset_y+4)]="=SUM(D5,D"+str(offset_y)+")"
+    sheet['E'+str(offset_y+4)]="=SUM(E5,E"+str(offset_y)+")"
+
+    for c in alphabet_uppercase[6:14:1] : 
+        sheet[c+str(offset_y+4)]="=SUM("+c+"5,-"+c+str(offset_y)+")"
+        sheet[c+str(offset_y+5)]=0
+        sheet[c+str(offset_y+7)]="=SUM("+c+str(offset_y+4)+","+c+str(offset_y+5)+",-"+c+str(offset_y+6)+")"
+
+    sheet["D"+str(offset_y+7)]="=SUM(D"+str(offset_y+4)+",D"+str(offset_y+5)+",-D"+str(offset_y+6)+")"
+    sheet["E"+str(offset_y+7)]="=SUM(E"+str(offset_y+4)+",E"+str(offset_y+5)+",-E"+str(offset_y+6)+")"
+
+    sheet["B"+str(offset_y+9)]="Kontroll"
+    sheet["B"+str(offset_y+10)]="Utgående saldo"
+    sheet["B"+str(offset_y+11)]="Ingående saldo"
+    sheet["B"+str(offset_y+12)]="Differens"
+
+    sheet["C"+str(offset_y+9)]="=SUM(C"+str(offset_y)+":N"+str(offset_y)+")"
+    sheet["C"+str(offset_y+10)]="=SUM(D"+str(offset_y+1)+":N"+str(offset_y+1)+")"
+    sheet["C"+str(offset_y+11)]="=SUM(D6:F6)"
+    sheet["C"+str(offset_y+12)]="=C"+str(offset_y+10)+"-C"+str(offset_y+11)
 
 def put_cost_entries(sheet, cost_entries):
     i=7
@@ -158,10 +205,8 @@ r = 7
 while sheet_out['B'+str(r)].value != None:
 
     # Sum cost
-    alphabet = string.ascii_uppercase
-    upper_limit = 14
     cost = 0
-    for c in alphabet[2:upper_limit:1] : 
+    for c in alphabet_uppercase[2:14:1] : 
         if sheet_out[c+str(r)].value != None:
             cost += max(sheet_out[c+str(r)].value, 0)
 
@@ -217,6 +262,6 @@ for cost_entry in cost_entries_summed:
 clear_sheet(sheet_out)
 generate_header(sheet_out)
 put_cost_entries(sheet_out, cost_entries_summed)
-generate_footer(sheet_out, 100)
+generate_footer(sheet_out, 28)
 
 wb_output.save(output_filename)
