@@ -38,7 +38,6 @@ def generate_header(sheet):
     sheet["N3"].value = "Övrigt"
     sheet["O3"].value = "Kommentar"
 
-    #TODO: Automate accumulated budget
     sheet["A4"].value = "Budgetering, ackumulerad från förra månaden"
     sheet["D4"].value = 0
     sheet["E4"].value = 0
@@ -51,7 +50,6 @@ def generate_header(sheet):
     sheet["M4"].value = 0
     sheet["N4"].value = 0
 
-    #TODO: Sample budget from a config
     sheet["A5"].value = "Budgetering"
     sheet["D5"].value = 1000
     sheet["E5"].value = 10090
@@ -64,11 +62,17 @@ def generate_header(sheet):
     sheet["M5"].value = 500
     sheet["N5"].value = 500
 
-    #TODO: Fix initial balance
     sheet["A6"].value = "Ingående balans"
     sheet["D6"].value = 150000
     sheet["E6"].value = 6000
     sheet["F6"].value = 1000
+
+    #TODO: Month/sheet separation
+    #TODO: Coppy manually entered budget and carryover to next month
+    #TODO: Fix initial balance, find from data
+    #TODO: Save initial balance between runs
+    #TODO: Fix initial balance between sheets
+    #TODO: Save transactions with multile target payments, prioritize the ones in the saved sheet over the input data
 
 def clear_sheet(sheet):
     sheet_out.delete_cols(1, 1000)
@@ -188,8 +192,6 @@ cost_type_translation_table = {
     "CLAS OHLSON 218": CostType.EXPENSE_HOUSEHOLD,
     "84319530719301": CostType.TRANSFER_SAVINGS_TO_CARD
 }
-
-# TODO: Month/sheet management
 
 # Read data file names
 input_filenames = []
