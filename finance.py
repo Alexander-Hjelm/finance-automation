@@ -264,6 +264,6 @@ for cost_entry in cost_entries_summed:
 clear_sheet(sheet_out)
 generate_header(sheet_out)
 put_cost_entries(sheet_out, cost_entries_summed)
-generate_footer(sheet_out, 28)
+generate_footer(sheet_out, 8+len(cost_entries_summed))
 
 wb_output.save(output_filename)
