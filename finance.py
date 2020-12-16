@@ -2,6 +2,7 @@ import sys
 import string
 from enum import Enum
 from openpyxl import load_workbook
+from openpyxl import Workbook
 
 alphabet_uppercase = string.ascii_uppercase
 
@@ -75,7 +76,7 @@ def generate_header(sheet):
     #TODO: Save transactions with multile target payments, prioritize the ones in the saved sheet over the input data
 
 def clear_sheet(sheet):
-    sheet_out.delete_cols(1, 1000)
+    sheet.delete_cols(1, 1000)
 
 def generate_footer(sheet, offset_y):
     sheet['B'+str(offset_y)]="Differens"
@@ -200,10 +201,12 @@ for i in range(1, len(sys.argv)-1):
 
 output_filename = sys.argv[-1]
 wb_output = load_workbook(output_filename)
-sheet_out = wb_output.active
 
-cost_entries_summed = []
+cost_entries_summed = {}
 r = 7
+
+#TODO: Collect payments for all sheets in the ouput file
+sheet_out = wb_output.active
 while sheet_out['B'+str(r)].value != None:
 
     # Sum cost
@@ -218,7 +221,11 @@ while sheet_out['B'+str(r)].value != None:
         cost,
         sheet_out['O'+str(r)].value
     )
-    cost_entries_summed.append(cost_entry)
+
+    month_identifier = str.rsplit(cost_entry.datetime, '-', 1)[0]
+    if not month_identifier in cost_entries_summed:
+        cost_entries_summed[month_identifier] = []
+    cost_entries_summed[month_identifier].append(cost_entry)
     r = r+1
 
 for filename in input_filenames:
@@ -244,26 +251,33 @@ for filename in input_filenames:
             sheet_in['E'+str(r)].value
         )
 
+        month_identifier = str.rsplit(cost_entry.datetime, '-', 1)[0]
+        if not month_identifier in cost_entries_summed:
+            cost_entries_summed[month_identifier] = []
+
         # Duplicate check
         duplicate_found = False
-        for cost_entry_2 in cost_entries_summed:
+        for cost_entry_2 in cost_entries_summed[month_identifier]:
             if cost_entry == cost_entry_2:
                 duplicate_found = True
                 break
 
         if not duplicate_found:
-            cost_entries_summed.append(cost_entry)
+            cost_entries_summed[month_identifier].append(cost_entry)
         r = r+1
 
-for cost_entry in cost_entries_summed:
-    print("*****************")
-    print(cost_entry.comment)
-    print(cost_entry.cost)
-    print(cost_entry.datetime)
+for month in cost_entries_summed.keys():
+    for cost_entry in cost_entries_summed[month]:
+        print("*****************")
+        print(cost_entry.comment)
+        print(cost_entry.cost)
+        print(cost_entry.datetime)
 
-clear_sheet(sheet_out)
+#TODO: Generate one sheet per month
+wb_output = Workbook()
+sheet_out = wb_output.active;
 generate_header(sheet_out)
-put_cost_entries(sheet_out, cost_entries_summed)
-generate_footer(sheet_out, 8+len(cost_entries_summed))
+put_cost_entries(sheet_out, cost_entries_summed["2020-11"])
+generate_footer(sheet_out, 8+len(cost_entries_summed["2020-11"]))
 
 wb_output.save(output_filename)
