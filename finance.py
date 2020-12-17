@@ -20,7 +20,7 @@ class CostTypeRule:
         self.from_field = from_field
         self.to_field = to_field
 
-def generate_header(sheet):
+def generate_header(sheet, initial_balances):
     sheet["C2"].value = "Inkomster"
     sheet["D2"].value = "Konton"
     sheet["G2"].value = "Utgifter"
@@ -64,16 +64,13 @@ def generate_header(sheet):
     sheet["N5"].value = 500
 
     sheet["A6"].value = "Ingående balans"
-    sheet["D6"].value = 150000
-    sheet["E6"].value = 6000
-    sheet["F6"].value = 1000
+    sheet["D6"].value = initial_balances["Transaktioner Privatkonto"]
+    sheet["E6"].value = initial_balances["Transaktioner Sparkonto"]
+    sheet["F6"].value = initial_balances["Transaktioner Aktiekonto"]
 
-    #TODO: Month/sheet separation
-    #TODO: Coppy manually entered budget and carryover to next month
-    #TODO: Fix initial balance, find from data
+    #TODO: Copy manually entered budget and carryover to next month
     #TODO: Save initial balance between runs
-    #TODO: Fix initial balance between sheets
-    #TODO: Save transactions with multile target payments, prioritize the ones in the saved sheet over the input data
+    #TODO: Save transactions with multiple target payments, prioritize the ones in the saved sheet over the input data
 
 def clear_sheet(sheet):
     sheet.delete_cols(1, 1000)
@@ -87,6 +84,20 @@ def generate_footer(sheet, offset_y):
     sheet['D'+str(offset_y+1)]="=SUM(D6,D"+str(offset_y)+")"
     sheet['E'+str(offset_y+1)]="=SUM(E6,E"+str(offset_y)+")"
     sheet['F'+str(offset_y+1)]="=SUM(F6,F"+str(offset_y)+")"
+
+    outgoing_balances = {
+        "Transaktioner Privatkonto": 0,
+        "Transaktioner Sparkonto": 0,
+        "Transaktioner Aktiekonto": 0
+    }
+    for i in range(6, offset_y):
+        if sheet['D'+str(i)].value is not None:
+            outgoing_balances["Transaktioner Privatkonto"] += sheet['D'+str(i)].value
+        if sheet['E'+str(i)].value is not None:
+            outgoing_balances["Transaktioner Sparkonto"] += sheet['E'+str(i)].value
+        if sheet['F'+str(i)].value is not None:
+            outgoing_balances["Transaktioner Aktiekonto"] += sheet['F'+str(i)].value
+
 
     sheet["D"+str(offset_y+3)].value = "Sparkonto"
     sheet["E"+str(offset_y+3)].value = "Aktiekonto"
@@ -126,6 +137,8 @@ def generate_footer(sheet, offset_y):
     sheet["C"+str(offset_y+10)]="=SUM(D"+str(offset_y+1)+":N"+str(offset_y+1)+")"
     sheet["C"+str(offset_y+11)]="=SUM(D6:F6)"
     sheet["C"+str(offset_y+12)]="=C"+str(offset_y+10)+"-C"+str(offset_y+11)
+
+    return outgoing_balances
 
 def put_cost_entries(sheet, cost_entries):
     i=7
@@ -229,17 +242,18 @@ for sheet_name in wb_output.sheetnames:
         cost_entries_summed[month_identifier].append(cost_entry)
         r = r+1
 
+initial_balances = {
+    "Transaktioner Privatkonto": 0,
+    "Transaktioner Sparkonto": 0,
+    "Transaktioner Aktiekonto": 0
+}
+
 for filename in input_filenames:
     # Load xlsx workbook
     wb_input = load_workbook(filename)
 
-    # List sheets available
-    #sheets = wb.get_sheet_names()
-    #print(sheets)
-
     # Load active sheet or named sheet
     sheet_in = wb_input.active
-    # sheet = wb['User Information']
 
     # Iterate over rows
     r = 9
@@ -267,6 +281,14 @@ for filename in input_filenames:
             cost_entries_summed[month_identifier].append(cost_entry)
         r = r+1
 
+    # Discern inital account balance
+    initial_balance = 0
+    i=9
+    while sheet_in['H'+str(i)].value != None:
+        initial_balance = sheet_in['H'+str(i)].value
+        i+=1
+    initial_balances[sheet_in["A1"].value] = initial_balance
+
 for month in cost_entries_summed.keys():
     for cost_entry in cost_entries_summed[month]:
         print("*****************")
@@ -274,13 +296,22 @@ for month in cost_entries_summed.keys():
         print(cost_entry.cost)
         print(cost_entry.datetime)
 
+print(initial_balances)
+
 wb_output = Workbook()
+
+# Sort the months
+months_to_iterate = []
 for month_identifier in cost_entries_summed.keys():
+    months_to_iterate.append(month_identifier)
+months_to_iterate.sort();
+
+for month_identifier in months_to_iterate:
     wb_output.create_sheet(month_identifier)
     sheet_out = wb_output.get_sheet_by_name(month_identifier)
-    generate_header(sheet_out)
+    generate_header(sheet_out, initial_balances)
     put_cost_entries(sheet_out, cost_entries_summed[month_identifier])
-    generate_footer(sheet_out, 8+len(cost_entries_summed[month_identifier]))
+    initial_balances = generate_footer(sheet_out, 8+len(cost_entries_summed[month_identifier]))
 wb_output.remove_sheet(wb_output.active)
 
 wb_output.save(output_filename)
