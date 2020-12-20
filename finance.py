@@ -52,16 +52,16 @@ def generate_header(sheet, initial_balances):
     sheet["N4"].value = 0
 
     sheet["A5"].value = "Budgetering"
-    sheet["D5"].value = 1000
-    sheet["E5"].value = 10090
-    sheet["G5"].value = 4000
-    sheet["H5"].value = 2000
-    sheet["I5"].value = 500
-    sheet["J5"].value = 500
-    sheet["K5"].value = 500
-    sheet["L5"].value = 500
-    sheet["M5"].value = 500
-    sheet["N5"].value = 500
+    sheet["D5"].value = 0
+    sheet["E5"].value = 0
+    sheet["G5"].value = 0
+    sheet["H5"].value = 0
+    sheet["I5"].value = 0
+    sheet["J5"].value = 0
+    sheet["K5"].value = 0
+    sheet["L5"].value = 0
+    sheet["M5"].value = 0
+    sheet["N5"].value = 0
 
     sheet["A6"].value = "Ingående balans"
     sheet["D6"].value = initial_balances["Transaktioner Privatkonto"]
@@ -307,16 +307,8 @@ saved_data["carryover"] = {}
 saved_data["manual_changes"] = {}
 
 first_sheet = wb_output.get_sheet_by_name(months_to_iterate[0])
-saved_data["initial_budget"].append(first_sheet["D5"].value)
-saved_data["initial_budget"].append(first_sheet["E5"].value)
-saved_data["initial_budget"].append(first_sheet["G5"].value)
-saved_data["initial_budget"].append(first_sheet["H5"].value)
-saved_data["initial_budget"].append(first_sheet["I5"].value)
-saved_data["initial_budget"].append(first_sheet["J5"].value)
-saved_data["initial_budget"].append(first_sheet["K5"].value)
-saved_data["initial_budget"].append(first_sheet["L5"].value)
-saved_data["initial_budget"].append(first_sheet["M5"].value)
-saved_data["initial_budget"].append(first_sheet["N5"].value)
+for c in alphabet_uppercase[6:14:1]: 
+    saved_data["initial_budget"].append(first_sheet[c+"5"].value)
 
 for month_identifier in months_to_iterate:
     sheet = wb_output.get_sheet_by_name(month_identifier)
@@ -327,11 +319,10 @@ for month_identifier in months_to_iterate:
     while sheet['B'+str(footer_y)].value != "Budgetdifferens, carryover":
         footer_y+=1
 
-    for c in alphabet_uppercase[6:14:1] : 
+    for c in alphabet_uppercase[6:14:1]: 
         saved_data["carryover"][month_identifier].append(sheet[c+str(footer_y)].value)
         saved_data["manual_changes"][month_identifier].append(sheet[c+str(footer_y+1)].value)
 
-#TODO: Copy manually entered budget and carryover to next month
 #TODO: Fixa total budget-fält + referenser
 #Refer to data in other sheets:
 #='2020-12'!K23
@@ -347,6 +338,23 @@ for month_identifier in months_to_iterate:
     generate_header(sheet_out, initial_balances)
     put_cost_entries(sheet_out, cost_entries_summed[month_identifier])
     initial_balances = generate_footer(sheet_out, 8+len(cost_entries_summed[month_identifier]))
+
+    # Load saved data
+    i=0
+    for c in alphabet_uppercase[6:14:1]: 
+        sheet_out[c+"5"].value = saved_data["initial_budget"][i]
+        i+=1
+
+    footer_y = 1
+    while sheet_out['B'+str(footer_y)].value != "Budgetdifferens, carryover":
+        footer_y+=1
+
+    i=0
+    for c in alphabet_uppercase[6:14:1]: 
+        sheet_out[c+str(footer_y)].value = saved_data["carryover"][month_identifier][i]
+        sheet_out[c+str(footer_y+1)].value = saved_data["manual_changes"][month_identifier][i]
+        i+=1
+
 wb_output.remove_sheet(wb_output.active)
 
 # Set budget reference to previous sheet
