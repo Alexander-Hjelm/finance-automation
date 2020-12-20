@@ -39,7 +39,7 @@ def generate_header(sheet, initial_balances):
     sheet["N3"].value = "Övrigt"
     sheet["O3"].value = "Kommentar"
 
-    sheet["A4"].value = "Budgetering, ackumulerad från förra månaden"
+    sheet["A4"].value = "Budgetering"
     sheet["D4"].value = 0
     sheet["E4"].value = 0
     sheet["G4"].value = 0
@@ -51,22 +51,10 @@ def generate_header(sheet, initial_balances):
     sheet["M4"].value = 0
     sheet["N4"].value = 0
 
-    sheet["A5"].value = "Budgetering"
-    sheet["D5"].value = 0
-    sheet["E5"].value = 0
-    sheet["G5"].value = 0
-    sheet["H5"].value = 0
-    sheet["I5"].value = 0
-    sheet["J5"].value = 0
-    sheet["K5"].value = 0
-    sheet["L5"].value = 0
-    sheet["M5"].value = 0
-    sheet["N5"].value = 0
-
-    sheet["A6"].value = "Ingående balans"
-    sheet["D6"].value = initial_balances["Transaktioner Privatkonto"]
-    sheet["E6"].value = initial_balances["Transaktioner Sparkonto"]
-    sheet["F6"].value = initial_balances["Transaktioner Aktiekonto"]
+    sheet["A5"].value = "Ingående balans"
+    sheet["D5"].value = initial_balances["Transaktioner Privatkonto"]
+    sheet["E5"].value = initial_balances["Transaktioner Sparkonto"]
+    sheet["F5"].value = initial_balances["Transaktioner Aktiekonto"]
 
     #TODO: Save transactions with multiple target payments, prioritize the ones in the saved sheet over the input data
 
@@ -76,9 +64,9 @@ def generate_footer(sheet, offset_y):
         sheet[c+str(offset_y)]="=SUM("+c+"7:"+c+str(offset_y-2)+")"
 
     sheet['B'+str(offset_y+1)]="Utgående saldo"
-    sheet['D'+str(offset_y+1)]="=SUM(D6,D"+str(offset_y)+")"
-    sheet['E'+str(offset_y+1)]="=SUM(E6,E"+str(offset_y)+")"
-    sheet['F'+str(offset_y+1)]="=SUM(F6,F"+str(offset_y)+")"
+    sheet['D'+str(offset_y+1)]="=SUM(D5,D"+str(offset_y)+")"
+    sheet['E'+str(offset_y+1)]="=SUM(E5,E"+str(offset_y)+")"
+    sheet['F'+str(offset_y+1)]="=SUM(F5,F"+str(offset_y)+")"
 
     outgoing_balances = {
         "Transaktioner Privatkonto": 0,
@@ -112,17 +100,17 @@ def generate_footer(sheet, offset_y):
     sheet["B"+str(offset_y+6)].value = "Budgetdifferens, manuella ändringar till nästa månad"
     sheet["B"+str(offset_y+7)].value = "Budget, ackumulerad nästa månad"
 
-    sheet['D'+str(offset_y+4)]="=SUM(D5,D"+str(offset_y)+")"
-    sheet['E'+str(offset_y+4)]="=SUM(E5,E"+str(offset_y)+")"
+    sheet['D'+str(offset_y+4)]="=SUM(D4,D"+str(offset_y)+")"
+    sheet['E'+str(offset_y+4)]="=SUM(E4,E"+str(offset_y)+")"
 
     for c in alphabet_uppercase[6:14:1] : 
-        sheet[c+str(offset_y+4)]="=SUM("+c+"5,-"+c+str(offset_y)+")"
+        sheet[c+str(offset_y+4)]="=SUM("+c+"4,-"+c+str(offset_y)+")"
         sheet[c+str(offset_y+5)]=0
         sheet[c+str(offset_y+6)]=0
-        sheet[c+str(offset_y+7)]="=SUM("+c+str(offset_y+4)+","+c+str(offset_y+5)+",-"+c+str(offset_y+6)+")"
+        sheet[c+str(offset_y+7)]="=SUM("+c+str(offset_y+4)+","+c+str(offset_y+4)+",-"+c+str(offset_y+6)+")"
 
-    sheet["D"+str(offset_y+7)]="=SUM(D"+str(offset_y+4)+",D"+str(offset_y+5)+",-D"+str(offset_y+6)+")"
-    sheet["E"+str(offset_y+7)]="=SUM(E"+str(offset_y+4)+",E"+str(offset_y+5)+",-E"+str(offset_y+6)+")"
+    sheet["D"+str(offset_y+7)]="=SUM(D"+str(offset_y+4)+",D"+str(offset_y+4)+",-D"+str(offset_y+6)+")"
+    sheet["E"+str(offset_y+7)]="=SUM(E"+str(offset_y+4)+",E"+str(offset_y+4)+",-E"+str(offset_y+6)+")"
 
     sheet["B"+str(offset_y+9)]="Kontroll"
     sheet["B"+str(offset_y+10)]="Utgående saldo"
@@ -308,7 +296,7 @@ saved_data["manual_changes"] = {}
 
 first_sheet = wb_output.get_sheet_by_name(months_to_iterate[0])
 for c in alphabet_uppercase[6:14:1]: 
-    saved_data["initial_budget"].append(first_sheet[c+"5"].value)
+    saved_data["initial_budget"].append(first_sheet[c+"4"].value)
 
 for month_identifier in months_to_iterate:
     sheet = wb_output.get_sheet_by_name(month_identifier)
@@ -323,7 +311,6 @@ for month_identifier in months_to_iterate:
         saved_data["carryover"][month_identifier].append(sheet[c+str(footer_y)].value)
         saved_data["manual_changes"][month_identifier].append(sheet[c+str(footer_y+1)].value)
 
-#TODO: Fixa total budget-fält + referenser
 #Refer to data in other sheets:
 #='2020-12'!K23
 
@@ -342,7 +329,7 @@ for month_identifier in months_to_iterate:
     # Load saved data
     i=0
     for c in alphabet_uppercase[6:14:1]: 
-        sheet_out[c+"5"].value = saved_data["initial_budget"][i]
+        sheet_out[c+"4"].value = saved_data["initial_budget"][i]
         i+=1
 
     footer_y = 1
