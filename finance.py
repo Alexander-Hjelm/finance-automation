@@ -6,7 +6,7 @@ from openpyxl import Workbook
 
 alphabet_uppercase = string.ascii_uppercase
 
-class CostEntry:
+class Payment:
     def __init__(self, datetime, cost, comment):
         self.datetime = datetime
         self.cost = cost
@@ -55,8 +55,6 @@ def generate_header(sheet, initial_balances):
     sheet["D5"].value = initial_balances["Transaktioner Privatkonto"]
     sheet["E5"].value = initial_balances["Transaktioner Sparkonto"]
     sheet["F5"].value = initial_balances["Transaktioner Aktiekonto"]
-
-    #TODO: Save transactions with multiple target payments, prioritize the ones in the saved sheet over the input data
 
 def generate_footer(sheet, offset_y):
     sheet['B'+str(offset_y)]="Differens"
@@ -124,25 +122,25 @@ def generate_footer(sheet, offset_y):
 
     return outgoing_balances
 
-def put_cost_entries(sheet, cost_entries):
+def put_payments(sheet, payments):
     i=7
-    for cost_entry in cost_entries:
-        if cost_entry.comment == None:
-            print("WARNING: Found cost entry comment that was None")
+    for payment in payments:
+        if payment.comment == None:
+            print("WARNING: Found payment comment that was None")
             continue
-        if not cost_entry.comment in cost_type_translation_table:
-            print("WARNING: Did not find comment: " + str(cost_entry.comment) + " in cost rules, please add it. Skipping for now...")
+        if not payment.comment in cost_type_translation_table:
+            print("WARNING: Did not find comment: " + str(payment.comment) + " in cost rules, please add it. Skipping for now...")
             continue
 
-        cost_type = cost_type_translation_table[cost_entry.comment]
+        cost_type = cost_type_translation_table[payment.comment]
         cost_rule = cost_type_rules[cost_type]
         from_field = cost_rule.from_field
         to_field = cost_rule.to_field
-        cost = cost_entry.cost
+        cost = payment.cost
         sheet[from_field + str(i)].value = -cost
         sheet[to_field + str(i)].value = cost
-        sheet['B' + str(i)].value = cost_entry.datetime
-        sheet['O' + str(i)].value = cost_entry.comment
+        sheet['B' + str(i)].value = payment.datetime
+        sheet['O' + str(i)].value = payment.comment
         i+=1
 
 # Config
@@ -199,8 +197,13 @@ for i in range(1, len(sys.argv)-1):
 output_filename = sys.argv[-1]
 wb_output = load_workbook(output_filename)
 
-cost_entries_summed = {}
+payments_summed = {}
 r = 7
+
+    #TODO: Modify payment structure to take multiple to-accounts
+    #TODO: Modify output file routine to read multiple to-accounts per payment
+    #TODO: Fix all places where the code has broken
+    #TODO: Match transactions from input fils to the output file, proritize the ones in the saved sheet over the input data
 
 # Collect payments for all sheets in the ouput file
 for sheet_name in wb_output.sheetnames:
@@ -214,16 +217,16 @@ for sheet_name in wb_output.sheetnames:
                 cost += max(sheet_out[c+str(r)].value, 0)
 
         # Read a specific cell
-        cost_entry = CostEntry(
+        payment = Payment(
             sheet_out['B'+str(r)].value,
             cost,
             sheet_out['O'+str(r)].value
         )
 
-        month_identifier = str.rsplit(cost_entry.datetime, '-', 1)[0]
-        if not month_identifier in cost_entries_summed:
-            cost_entries_summed[month_identifier] = []
-        cost_entries_summed[month_identifier].append(cost_entry)
+        month_identifier = str.rsplit(payment.datetime, '-', 1)[0]
+        if not month_identifier in payments_summed:
+            payments_summed[month_identifier] = []
+        payments_summed[month_identifier].append(payment)
         r = r+1
 
 initial_balances = {
@@ -244,25 +247,25 @@ for filename in input_filenames:
     while sheet_in['A'+str(r)].value != None:
 
         # Read a specific cell
-        cost_entry = CostEntry(
+        payment = Payment(
             sheet_in['C'+str(r)].value,
             abs(sheet_in['G'+str(r)].value),
             sheet_in['E'+str(r)].value
         )
 
-        month_identifier = str.rsplit(cost_entry.datetime, '-', 1)[0]
-        if not month_identifier in cost_entries_summed:
-            cost_entries_summed[month_identifier] = []
+        month_identifier = str.rsplit(payment.datetime, '-', 1)[0]
+        if not month_identifier in payments_summed:
+            payments_summed[month_identifier] = []
 
         # Duplicate check
         duplicate_found = False
-        for cost_entry_2 in cost_entries_summed[month_identifier]:
-            if cost_entry == cost_entry_2:
+        for payment_2 in payments_summed[month_identifier]:
+            if payment == payment_2:
                 duplicate_found = True
                 break
 
         if not duplicate_found:
-            cost_entries_summed[month_identifier].append(cost_entry)
+            payments_summed[month_identifier].append(payment)
         r = r+1
 
     # Discern inital account balance
@@ -273,18 +276,18 @@ for filename in input_filenames:
         i+=1
     initial_balances[sheet_in["A1"].value] = initial_balance
 
-for month in cost_entries_summed.keys():
-    for cost_entry in cost_entries_summed[month]:
+for month in payments_summed.keys():
+    for payment in payments_summed[month]:
         print("*****************")
-        print(cost_entry.comment)
-        print(cost_entry.cost)
-        print(cost_entry.datetime)
+        print(payment.comment)
+        print(payment.cost)
+        print(payment.datetime)
 
 print(initial_balances)
 
 # Sort the months
 months_to_iterate = []
-for month_identifier in cost_entries_summed.keys():
+for month_identifier in payments_summed.keys():
     months_to_iterate.append(month_identifier)
 months_to_iterate.sort();
 
@@ -323,8 +326,8 @@ for month_identifier in months_to_iterate:
     wb_output.create_sheet(month_identifier)
     sheet_out = wb_output.get_sheet_by_name(month_identifier)
     generate_header(sheet_out, initial_balances)
-    put_cost_entries(sheet_out, cost_entries_summed[month_identifier])
-    initial_balances = generate_footer(sheet_out, 8+len(cost_entries_summed[month_identifier]))
+    put_payments(sheet_out, payments_summed[month_identifier])
+    initial_balances = generate_footer(sheet_out, 8+len(payments_summed[month_identifier]))
 
     # Load saved data
     i=0
