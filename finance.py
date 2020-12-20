@@ -68,9 +68,7 @@ def generate_header(sheet, initial_balances):
     sheet["E6"].value = initial_balances["Transaktioner Sparkonto"]
     sheet["F6"].value = initial_balances["Transaktioner Aktiekonto"]
 
-    #TODO: Copy manually entered budget and carryover to next month
     #TODO: Save transactions with multiple target payments, prioritize the ones in the saved sheet over the input data
-    #TODO: Save initial balance + carryover between runs
 
 def generate_footer(sheet, offset_y):
     sheet['B'+str(offset_y)]="Differens"
@@ -333,6 +331,11 @@ for month_identifier in months_to_iterate:
         saved_data["carryover"][month_identifier].append(sheet[c+str(footer_y)].value)
         saved_data["manual_changes"][month_identifier].append(sheet[c+str(footer_y+1)].value)
 
+#TODO: Copy manually entered budget and carryover to next month
+#TODO: Fixa total budget-fält + referenser
+#Refer to data in other sheets:
+#='2020-12'!K23
+
 print(saved_data)
 
 # Clear output workbook
@@ -345,5 +348,17 @@ for month_identifier in months_to_iterate:
     put_cost_entries(sheet_out, cost_entries_summed[month_identifier])
     initial_balances = generate_footer(sheet_out, 8+len(cost_entries_summed[month_identifier]))
 wb_output.remove_sheet(wb_output.active)
+
+# Set budget reference to previous sheet
+for month_index in range(0, len(months_to_iterate)-1):
+    sheet_1 = wb_output.get_sheet_by_name(months_to_iterate[month_index])
+    sheet_2 = wb_output.get_sheet_by_name(months_to_iterate[month_index+1])
+
+    footer_y_1 = 1
+    while sheet_1['B'+str(footer_y_1)].value != "Budget, ackumulerad nästa månad":
+        footer_y_1+=1
+
+    for c in alphabet_uppercase[3:14:1] : 
+        sheet_2[c+str(4)].value="='"+months_to_iterate[month_index]+"'!"+c+str(footer_y_1)
 
 wb_output.save(output_filename)
