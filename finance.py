@@ -69,11 +69,8 @@ def generate_header(sheet, initial_balances):
     sheet["F6"].value = initial_balances["Transaktioner Aktiekonto"]
 
     #TODO: Copy manually entered budget and carryover to next month
-    #TODO: Save initial balance between runs
     #TODO: Save transactions with multiple target payments, prioritize the ones in the saved sheet over the input data
-
-def clear_sheet(sheet):
-    sheet.delete_cols(1, 1000)
+    #TODO: Save initial balance + carryover between runs
 
 def generate_footer(sheet, offset_y):
     sheet['B'+str(offset_y)]="Differens"
@@ -123,6 +120,7 @@ def generate_footer(sheet, offset_y):
     for c in alphabet_uppercase[6:14:1] : 
         sheet[c+str(offset_y+4)]="=SUM("+c+"5,-"+c+str(offset_y)+")"
         sheet[c+str(offset_y+5)]=0
+        sheet[c+str(offset_y+6)]=0
         sheet[c+str(offset_y+7)]="=SUM("+c+str(offset_y+4)+","+c+str(offset_y+5)+",-"+c+str(offset_y+6)+")"
 
     sheet["D"+str(offset_y+7)]="=SUM(D"+str(offset_y+4)+",D"+str(offset_y+5)+",-D"+str(offset_y+6)+")"
@@ -298,13 +296,47 @@ for month in cost_entries_summed.keys():
 
 print(initial_balances)
 
-wb_output = Workbook()
-
 # Sort the months
 months_to_iterate = []
 for month_identifier in cost_entries_summed.keys():
     months_to_iterate.append(month_identifier)
 months_to_iterate.sort();
+
+# Save initial buget
+saved_data = {}
+saved_data["initial_budget"] = []
+saved_data["carryover"] = {}
+saved_data["manual_changes"] = {}
+
+first_sheet = wb_output.get_sheet_by_name(months_to_iterate[0])
+saved_data["initial_budget"].append(first_sheet["D5"].value)
+saved_data["initial_budget"].append(first_sheet["E5"].value)
+saved_data["initial_budget"].append(first_sheet["G5"].value)
+saved_data["initial_budget"].append(first_sheet["H5"].value)
+saved_data["initial_budget"].append(first_sheet["I5"].value)
+saved_data["initial_budget"].append(first_sheet["J5"].value)
+saved_data["initial_budget"].append(first_sheet["K5"].value)
+saved_data["initial_budget"].append(first_sheet["L5"].value)
+saved_data["initial_budget"].append(first_sheet["M5"].value)
+saved_data["initial_budget"].append(first_sheet["N5"].value)
+
+for month_identifier in months_to_iterate:
+    sheet = wb_output.get_sheet_by_name(month_identifier)
+    saved_data["carryover"][month_identifier] = []
+    saved_data["manual_changes"][month_identifier] = []
+
+    footer_y = 1
+    while sheet['B'+str(footer_y)].value != "Budgetdifferens, carryover":
+        footer_y+=1
+
+    for c in alphabet_uppercase[6:14:1] : 
+        saved_data["carryover"][month_identifier].append(sheet[c+str(footer_y)].value)
+        saved_data["manual_changes"][month_identifier].append(sheet[c+str(footer_y+1)].value)
+
+print(saved_data)
+
+# Clear output workbook
+wb_output = Workbook()
 
 for month_identifier in months_to_iterate:
     wb_output.create_sheet(month_identifier)
