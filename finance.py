@@ -4,6 +4,8 @@ from enum import Enum
 from openpyxl import load_workbook
 from openpyxl import Workbook
 
+#TODO: Test with data from multiple bank drafts
+
 alphabet_uppercase = string.ascii_uppercase
 
 class Payment:
@@ -23,6 +25,17 @@ class Payment:
             if cost_type not in other.costs_per_letter.keys() or self.costs_per_letter[cost_type] != other.costs_per_letter[cost_type]:
                 cost_equals == False
         return self.datetime == other.datetime and self.comment == other.comment and cost_equals
+
+    def similar_to(self, other):
+        total_cost_1 = 0
+        for letter in self.costs_per_letter.keys():
+            total_cost_1 += self.costs_per_letter[letter]
+
+        total_cost_2 = 0
+        for letter in other.costs_per_letter.keys():
+            total_cost_2 += other.costs_per_letter[letter]
+
+        return self.datetime == other.datetime and self.comment == other.comment and total_cost_1 == total_cost_2
 
 class CostTypeRule:
     def __init__(self, from_field, to_field):
@@ -207,9 +220,6 @@ wb_output = load_workbook(output_filename)
 payments_summed = {}
 r = 7
 
-#TODO: Fix all places where the code has broken
-#TODO: Match transactions from input fils to the output file, proritize the ones in the saved sheet over the input data
-
 # Collect payments for all sheets in the ouput file
 for sheet_name in wb_output.sheetnames:
     sheet_out = wb_output.get_sheet_by_name(sheet_name)
@@ -242,6 +252,7 @@ initial_balances = {
     "Transaktioner Aktiekonto": 0
 }
 
+# Collect payments from input files
 for filename in input_filenames:
     # Load xlsx workbook
     wb_input = load_workbook(filename)
@@ -277,15 +288,26 @@ for filename in input_filenames:
         if not month_identifier in payments_summed:
             payments_summed[month_identifier] = []
 
-        # Duplicate check
-        duplicate_found = False
+        # Similar check. If similar, prioritize the payment from the output file,
+        # since it can contain payments with multiple outputs
+        similar_payment_found = False
         for payment_2 in payments_summed[month_identifier]:
-            if payment == payment_2:
-                duplicate_found = True
+            if payment.similar_to(payment_2):
+                similar_payment_found = True
+                print("Similar payment found")
                 break
+        if similar_payment_found:
+            continue
 
-        if not duplicate_found:
-            payments_summed[month_identifier].append(payment)
+        # Duplicate check
+        #duplicate_found = False
+        #for payment_2 in payments_summed[month_identifier]:
+        #    if payment == payment_2:
+        #        duplicate_found = True
+        #        break
+
+        #if not duplicate_found:
+        payments_summed[month_identifier].append(payment)
 
     # Discern inital account balance
     initial_balance = 0
