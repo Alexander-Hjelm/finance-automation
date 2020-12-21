@@ -7,13 +7,22 @@ from openpyxl import Workbook
 alphabet_uppercase = string.ascii_uppercase
 
 class Payment:
-    def __init__(self, datetime, cost, comment):
+    def __init__(self, datetime, comment):
         self.datetime = datetime
-        self.cost = cost
         self.comment = comment
+        self.costs_per_letter = {}
+
+    def set_cost(self, letter, cost):
+        if type(letter) != type('a'):
+            aaa
+        self.costs_per_letter[letter] = cost
 
     def __eq__(self, other):
-        return self.datetime == other.datetime and self.cost == other.cost and self.comment == other.comment
+        cost_equals = True
+        for cost_type in self.costs_per_letter.keys():
+            if cost_type not in other.costs_per_letter.keys() or self.costs_per_letter[cost_type] != other.costs_per_letter[cost_type]:
+                cost_equals == False
+        return self.datetime == other.datetime and self.comment == other.comment and cost_equals
 
 class CostTypeRule:
     def __init__(self, from_field, to_field):
@@ -125,22 +134,14 @@ def generate_footer(sheet, offset_y):
 def put_payments(sheet, payments):
     i=7
     for payment in payments:
-        if payment.comment == None:
-            print("WARNING: Found payment comment that was None")
-            continue
-        if not payment.comment in cost_type_translation_table:
-            print("WARNING: Did not find comment: " + str(payment.comment) + " in cost rules, please add it. Skipping for now...")
-            continue
-
-        cost_type = cost_type_translation_table[payment.comment]
-        cost_rule = cost_type_rules[cost_type]
-        from_field = cost_rule.from_field
-        to_field = cost_rule.to_field
-        cost = payment.cost
-        sheet[from_field + str(i)].value = -cost
-        sheet[to_field + str(i)].value = cost
         sheet['B' + str(i)].value = payment.datetime
         sheet['O' + str(i)].value = payment.comment
+        for letter in payment.costs_per_letter.keys():
+            #cost_rule = cost_type_rules[cost_type]
+            #from_field = cost_rule.from_field
+            #to_field = cost_rule.to_field
+            cost = payment.costs_per_letter[letter]
+            sheet[letter + str(i)].value = -cost
         i+=1
 
 # Config
@@ -159,20 +160,26 @@ class CostType(Enum):
     TRANSFER_SAVINGS_TO_CARD=11
     TRANSFER_SAVINGS_TO_STOCK=12
 
+payment_fields = {
+    'G': CostType.EXPENSE_ROUTINE,
+    'H': CostType.EXPENSE_FOOD,
+    'I': CostType.EXPENSE_HOUSEHOLD,
+    'J': CostType.EXPENSE_HOBBY,
+    'K': CostType.EXPENSE_FUN,
+    'L': CostType.EXPENSE_TRAVEL,
+    'M': CostType.EXPENSE_CLOTHING,
+    'N': CostType.EXPENSE_MISC,
+    '': CostType.EXPENSE_GIFTS
+}
+
 cost_type_rules = {
-    CostType.EXPENSE_CLOTHING: CostTypeRule('F', 'M'),
-    CostType.EXPENSE_FOOD: CostTypeRule('F', 'H'),
-    CostType.EXPENSE_FUN: CostTypeRule('F', 'K'),
-    CostType.EXPENSE_GIFTS: CostTypeRule('F', ''),
-    CostType.EXPENSE_HOBBY: CostTypeRule('F', 'J'),
-    CostType.EXPENSE_HOUSEHOLD: CostTypeRule('F', 'I'),
-    CostType.EXPENSE_MISC: CostTypeRule('F', 'N'),
-    CostType.EXPENSE_ROUTINE: CostTypeRule('F', 'G'),
-    CostType.EXPENSE_TRAVEL: CostTypeRule('F', 'L'),
     CostType.INCOME: CostTypeRule('C', 'D'),
     CostType.TRANSFER_SAVINGS_TO_CARD: CostTypeRule('D', 'F'),
     CostType.TRANSFER_SAVINGS_TO_STOCK: CostTypeRule('D', 'E')
 }
+
+for field in payment_fields.keys():
+    cost_type_rules[payment_fields[field]] = CostTypeRule('F', field)
 
 cost_type_translation_table = {
     "EMMAUS": CostType.EXPENSE_CLOTHING,
@@ -200,28 +207,28 @@ wb_output = load_workbook(output_filename)
 payments_summed = {}
 r = 7
 
-    #TODO: Modify payment structure to take multiple to-accounts
-    #TODO: Modify output file routine to read multiple to-accounts per payment
-    #TODO: Fix all places where the code has broken
-    #TODO: Match transactions from input fils to the output file, proritize the ones in the saved sheet over the input data
+#TODO: Fix all places where the code has broken
+#TODO: Match transactions from input fils to the output file, proritize the ones in the saved sheet over the input data
 
 # Collect payments for all sheets in the ouput file
 for sheet_name in wb_output.sheetnames:
     sheet_out = wb_output.get_sheet_by_name(sheet_name)
     while sheet_out['B'+str(r)].value != None:
 
-        # Sum cost
-        cost = 0
-        for c in alphabet_uppercase[2:14:1] : 
-            if sheet_out[c+str(r)].value != None:
-                cost += max(sheet_out[c+str(r)].value, 0)
+        comment=sheet_out['O'+str(r)].value
 
         # Read a specific cell
         payment = Payment(
             sheet_out['B'+str(r)].value,
-            cost,
-            sheet_out['O'+str(r)].value
+            comment
         )
+
+        # Sum cost
+        costs_per_field = {}
+        for c in alphabet_uppercase[2:14:1] : 
+            cost = sheet_out[c+str(r)].value
+            if cost != None:
+                payment.set_cost(c, cost)
 
         month_identifier = str.rsplit(payment.datetime, '-', 1)[0]
         if not month_identifier in payments_summed:
@@ -243,15 +250,28 @@ for filename in input_filenames:
     sheet_in = wb_input.active
 
     # Iterate over rows
-    r = 9
+    r = 8
     while sheet_in['A'+str(r)].value != None:
+        r = r+1
+        comment =sheet_in['E'+str(r)].value
+        if comment == None:
+            print("WARNING: Found payment comment that was None")
+            continue
+        if not comment in cost_type_translation_table:
+            print("WARNING: Did not find comment: " + str(payment.comment) + " in cost rules, please add it. Skipping for now...")
+            continue
 
         # Read a specific cell
         payment = Payment(
             sheet_in['C'+str(r)].value,
-            abs(sheet_in['G'+str(r)].value),
-            sheet_in['E'+str(r)].value
+            sheet_in['E'+str(r)].value,
         )
+
+        cost_type = cost_type_translation_table[comment]
+        cost_rule = cost_type_rules[cost_type]
+        cost = abs(sheet_in['G'+str(r)].value)
+        payment.set_cost(cost_rule.from_field, -cost)
+        payment.set_cost(cost_rule.to_field, cost)
 
         month_identifier = str.rsplit(payment.datetime, '-', 1)[0]
         if not month_identifier in payments_summed:
@@ -266,7 +286,6 @@ for filename in input_filenames:
 
         if not duplicate_found:
             payments_summed[month_identifier].append(payment)
-        r = r+1
 
     # Discern inital account balance
     initial_balance = 0
@@ -279,9 +298,8 @@ for filename in input_filenames:
 for month in payments_summed.keys():
     for payment in payments_summed[month]:
         print("*****************")
-        print(payment.comment)
-        print(payment.cost)
         print(payment.datetime)
+        print(payment.costs_per_letter)
 
 print(initial_balances)
 
