@@ -26,6 +26,41 @@ class Payment:
                 cost_equals == False
         return self.datetime == other.datetime and self.comment == other.comment and cost_equals
 
+    def __lt__(self, other):
+        y_self = int(str.split(self.datetime, '-')[0])
+        m_self = int(str.split(self.datetime, '-')[1])
+        d_self = int(str.split(self.datetime, '-')[2])
+
+        y_other = int(str.split(other.datetime, '-')[0])
+        m_other = int(str.split(other.datetime, '-')[1])
+        d_other = int(str.split(other.datetime, '-')[2])
+
+        if y_self < y_other:
+            return True
+        elif y_self == y_other and m_self < m_other:
+            return True
+        elif y_self == y_other and m_self == m_other and d_self < d_other:
+            return True
+        return False
+
+    def __gt__(self, other):
+        y_self = int(str.split(self.datetime, '-')[0])
+        m_self = int(str.split(self.datetime, '-')[1])
+        d_self = int(str.split(self.datetime, '-')[2])
+
+        y_other = int(str.split(other.datetime, '-')[0])
+        m_other = int(str.split(other.datetime, '-')[1])
+        d_other = int(str.split(other.datetime, '-')[2])
+
+        if y_self > y_other:
+            return True
+        elif y_self == y_other and m_self > m_other:
+            return True
+        elif y_self == y_other and m_self == m_other and d_self > d_other:
+            return True
+        return False
+
+
     def similar_to(self, other):
         total_cost_1 = 0
         for letter in self.costs_per_letter.keys():
@@ -329,7 +364,11 @@ print(initial_balances)
 months_to_iterate = []
 for month_identifier in payments_summed.keys():
     months_to_iterate.append(month_identifier)
-months_to_iterate.sort();
+months_to_iterate.sort()
+
+# Sort the payments per month
+for month_identifier in payments_summed.keys():
+    payments_summed[month_identifier].sort()
 
 # Save initial buget
 saved_data = {}
