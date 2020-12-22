@@ -283,13 +283,12 @@ output_filename = sys.argv[-1]
 wb_output = load_workbook(output_filename)
 
 payments_summed = {}
-r = 7
 
 # Collect payments for all sheets in the ouput file
 for sheet_name in wb_output.sheetnames:
+    r = 7
     sheet_out = wb_output.get_sheet_by_name(sheet_name)
     while sheet_out['B'+str(r)].value != None:
-
         comment=sheet_out['O'+str(r)].value
 
         # Read a specific cell
@@ -329,12 +328,12 @@ for filename in input_filenames:
     r = 8
     while sheet_in['A'+str(r)].value != None:
         r = r+1
-        comment =sheet_in['E'+str(r)].value
+        comment=sheet_in['E'+str(r)].value
         if comment == None:
             print("WARNING: Found payment comment that was None")
             continue
         if not comment in cost_type_translation_table:
-            print("WARNING: Did not find comment: " + str(payment.comment) + " in cost rules, please add it. Skipping for now...")
+            print("WARNING: Did not find comment: " + str(comment) + " in cost rules, please add it. Skipping for now...")
             continue
 
         # Read a specific cell
@@ -359,7 +358,6 @@ for filename in input_filenames:
         for payment_2 in payments_summed[month_identifier]:
             if payment.similar_to(payment_2):
                 similar_payment_found = True
-                print("Similar payment found")
                 break
         if similar_payment_found:
             continue
