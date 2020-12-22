@@ -4,7 +4,7 @@ from enum import Enum
 from openpyxl import load_workbook
 from openpyxl import Workbook
 
-#TODO: Test with data from multiple bank drafts
+#TODO: Include data from investment account
 
 alphabet_uppercase = string.ascii_uppercase
 
@@ -185,9 +185,6 @@ def put_payments(sheet, payments):
         sheet['B' + str(i)].value = payment.datetime
         sheet['O' + str(i)].value = payment.comment
         for letter in payment.costs_per_letter.keys():
-            #cost_rule = cost_type_rules[cost_type]
-            #from_field = cost_rule.from_field
-            #to_field = cost_rule.to_field
             cost = payment.costs_per_letter[letter]
             sheet[letter + str(i)].value = -cost
         i+=1
@@ -232,16 +229,49 @@ for field in payment_fields.keys():
 cost_type_translation_table = {
     "EMMAUS": CostType.EXPENSE_CLOTHING,
     "STADIUM DROTTNI": CostType.EXPENSE_CLOTHING,
+    "HM SE0060": CostType.EXPENSE_CLOTHING,
+    "HM SE0020": CostType.EXPENSE_CLOTHING,
+    "HAIR & COSMETIC": CostType.EXPENSE_CLOTHING,
+    "UNIQLO MALL OF": CostType.EXPENSE_CLOTHING,
     "AB STORSTOCKHOL": CostType.EXPENSE_FOOD,
     "BURGER KING ODE": CostType.EXPENSE_FOOD,
     "HEMKÖP DJURGÅRDS": CostType.EXPENSE_FOOD,
     "HEMKÖP SOLNA MAL": CostType.EXPENSE_FOOD,
     "ICA LAPPKARRSBER": CostType.EXPENSE_FOOD,
+    "RAMEN KI MAMA": CostType.EXPENSE_FOOD,
+    "HEMKÖP CITY STOC": CostType.EXPENSE_FOOD,
+    "VETE-KATTEN AB": CostType.EXPENSE_FOOD,
+    "MAX MALL OF SCAN": CostType.EXPENSE_FOOD,
+    "ICA NARA SERGELS": CostType.EXPENSE_FOOD,
+    "HIMALAYA LIVS": CostType.EXPENSE_FOOD,
+    "PRESSBYRÅN 41082": CostType.EXPENSE_FOOD,
+    "PRESSBYRÅN 42501": CostType.EXPENSE_FOOD,
+    "COOP GUBBÄNGEN": CostType.EXPENSE_FOOD,
+    "926446 RESTAURAN": CostType.EXPENSE_FOOD,
+    "RESTAURANG AND P": CostType.EXPENSE_FOOD,
+    "BAGERIET I POULT": CostType.EXPENSE_FOOD,
+    "SJ AB OMBORD": CostType.EXPENSE_FOOD,
     "PROFESSORN RESTA": CostType.EXPENSE_FUN,
+    "NON SOLO BAR ROR": CostType.EXPENSE_FUN,
+    "PADELVERKET SPAN": CostType.EXPENSE_FUN,
+    "SYSTEMBOLAGET": CostType.EXPENSE_FUN,
+    "SYSTEMBOLAGET SO": CostType.EXPENSE_FUN,
     "CLAS OHLSON": CostType.EXPENSE_HOUSEHOLD,
+    "SL @STERMALMSTO": CostType.EXPENSE_TRAVEL,
     "FOLKTANDVÅRD": CostType.EXPENSE_ROUTINE,
+    "Bostadsförmedlin": CostType.EXPENSE_ROUTINE,
+    "STIFT  STOCKHOLM": CostType.EXPENSE_ROUTINE,
+    "LOOPIA AB": CostType.EXPENSE_ROUTINE,
+    "Telia Mobile": CostType.EXPENSE_ROUTINE,
     "CLAS OHLSON 218": CostType.EXPENSE_HOUSEHOLD,
-    "84319530719301": CostType.TRANSFER_SAVINGS_TO_CARD
+    "APOTEK HJARTAT A": CostType.EXPENSE_HOUSEHOLD,
+    "84319530719301": CostType.TRANSFER_SAVINGS_TO_CARD,
+    "84319530717529": CostType.TRANSFER_SAVINGS_TO_CARD,
+    "84319531718757": CostType.TRANSFER_SAVINGS_TO_STOCK,
+    "@STRAS STATIONS": CostType.EXPENSE_MISC,
+    "KONSTNARERNAS CE": CostType.EXPENSE_MISC,
+    "SVEN HORNELL AB": CostType.EXPENSE_MISC,
+    "LON": CostType.INCOME
 }
 
 # Read data file names
@@ -354,9 +384,10 @@ for filename in input_filenames:
 
 for month in payments_summed.keys():
     for payment in payments_summed[month]:
-        print("*****************")
-        print(payment.datetime)
-        print(payment.costs_per_letter)
+        pass
+        #print("*****************")
+        #print(payment.datetime)
+        #print(payment.costs_per_letter)
 
 print(initial_balances)
 
