@@ -376,22 +376,24 @@ saved_data["initial_budget"] = []
 saved_data["carryover"] = {}
 saved_data["manual_changes"] = {}
 
-first_sheet = wb_output.get_sheet_by_name(months_to_iterate[0])
-for c in alphabet_uppercase[6:14:1]: 
-    saved_data["initial_budget"].append(first_sheet[c+"4"].value)
+if(months_to_iterate[0] in wb_output.sheetnames):
+    first_sheet = wb_output.get_sheet_by_name(months_to_iterate[0])
+    for c in alphabet_uppercase[6:14:1]: 
+        saved_data["initial_budget"].append(first_sheet[c+"4"].value)
 
 for month_identifier in months_to_iterate:
-    sheet = wb_output.get_sheet_by_name(month_identifier)
-    saved_data["carryover"][month_identifier] = []
-    saved_data["manual_changes"][month_identifier] = []
+    if(month_identifier in wb_output.sheetnames):
+        sheet = wb_output.get_sheet_by_name(month_identifier)
+        saved_data["carryover"][month_identifier] = []
+        saved_data["manual_changes"][month_identifier] = []
 
-    footer_y = 1
-    while sheet['B'+str(footer_y)].value != "Budgetdifferens, carryover":
-        footer_y+=1
+        footer_y = 1
+        while sheet['B'+str(footer_y)].value != "Budgetdifferens, carryover":
+            footer_y+=1
 
-    for c in alphabet_uppercase[6:14:1]: 
-        saved_data["carryover"][month_identifier].append(sheet[c+str(footer_y)].value)
-        saved_data["manual_changes"][month_identifier].append(sheet[c+str(footer_y+1)].value)
+        for c in alphabet_uppercase[6:14:1]: 
+            saved_data["carryover"][month_identifier].append(sheet[c+str(footer_y)].value)
+            saved_data["manual_changes"][month_identifier].append(sheet[c+str(footer_y+1)].value)
 
 #Refer to data in other sheets:
 #='2020-12'!K23
@@ -409,20 +411,22 @@ for month_identifier in months_to_iterate:
     initial_balances = generate_footer(sheet_out, 8+len(payments_summed[month_identifier]))
 
     # Load saved data
-    i=0
-    for c in alphabet_uppercase[6:14:1]: 
-        sheet_out[c+"4"].value = saved_data["initial_budget"][i]
-        i+=1
+    if "initial budget" in saved_data.keys() and len(saved_data["initial budget"]) > 0:
+        i=0
+        for c in alphabet_uppercase[6:14:1]: 
+            sheet_out[c+"4"].value = saved_data["initial_budget"][i]
+            i+=1
 
     footer_y = 1
     while sheet_out['B'+str(footer_y)].value != "Budgetdifferens, carryover":
         footer_y+=1
 
-    i=0
-    for c in alphabet_uppercase[6:14:1]: 
-        sheet_out[c+str(footer_y)].value = saved_data["carryover"][month_identifier][i]
-        sheet_out[c+str(footer_y+1)].value = saved_data["manual_changes"][month_identifier][i]
-        i+=1
+    if "carryover" in saved_data.keys() and len(saved_data["carryover"]) > 0:
+        i=0
+        for c in alphabet_uppercase[6:14:1]: 
+            sheet_out[c+str(footer_y)].value = saved_data["carryover"][month_identifier][i]
+            sheet_out[c+str(footer_y+1)].value = saved_data["manual_changes"][month_identifier][i]
+            i+=1
 
 wb_output.remove_sheet(wb_output.active)
 
