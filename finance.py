@@ -109,9 +109,9 @@ def generate_header(sheet, initial_balances):
     sheet["N4"].value = 0
 
     sheet["A5"].value = "Ingående balans"
-    sheet["D5"].value = initial_balances["Transaktioner Privatkonto"]
-    sheet["E5"].value = initial_balances["Transaktioner Sparkonto"]
-    sheet["F5"].value = initial_balances["Transaktioner Aktiekonto"]
+    sheet["D5"].value = initial_balances["Transaktioner e-sparkonto"]
+    sheet["E5"].value = initial_balances["Transaktioner Aktiekonto"]
+    sheet["F5"].value = initial_balances["Transaktioner Privatkonto"]
 
 def generate_footer(sheet, offset_y):
     sheet['B'+str(offset_y)]="Differens"
@@ -125,14 +125,14 @@ def generate_footer(sheet, offset_y):
 
     outgoing_balances = {
         "Transaktioner Privatkonto": 0,
-        "Transaktioner Sparkonto": 0,
+        "Transaktioner e-sparkonto": 0,
         "Transaktioner Aktiekonto": 0
     }
     for i in range(6, offset_y):
         if sheet['D'+str(i)].value is not None:
             outgoing_balances["Transaktioner Privatkonto"] += sheet['D'+str(i)].value
         if sheet['E'+str(i)].value is not None:
-            outgoing_balances["Transaktioner Sparkonto"] += sheet['E'+str(i)].value
+            outgoing_balances["Transaktioner e-sparkonto"] += sheet['E'+str(i)].value
         if sheet['F'+str(i)].value is not None:
             outgoing_balances["Transaktioner Aktiekonto"] += sheet['F'+str(i)].value
 
@@ -283,7 +283,7 @@ for sheet_name in wb_output.sheetnames:
 
 initial_balances = {
     "Transaktioner Privatkonto": 0,
-    "Transaktioner Sparkonto": 0,
+    "Transaktioner e-sparkonto": 0,
     "Transaktioner Aktiekonto": 0
 }
 
