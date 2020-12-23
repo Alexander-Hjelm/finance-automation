@@ -77,7 +77,7 @@ class CostTypeRule:
         self.from_field = from_field
         self.to_field = to_field
 
-def generate_header(sheet, initial_balances):
+def generate_header(sheet):
     sheet["C2"].value = "Inkomster"
     sheet["D2"].value = "Konton"
     sheet["G2"].value = "Utgifter"
@@ -123,20 +123,6 @@ def generate_footer(sheet, offset_y):
     sheet['E'+str(offset_y+1)]="=SUM(E5,E"+str(offset_y)+")"
     sheet['F'+str(offset_y+1)]="=SUM(F5,F"+str(offset_y)+")"
 
-    outgoing_balances = {
-        "Transaktioner Privatkonto": 0,
-        "Transaktioner e-sparkonto": 0,
-        "Transaktioner Aktiekonto": 0
-    }
-    for i in range(6, offset_y):
-        if sheet['D'+str(i)].value is not None:
-            outgoing_balances["Transaktioner Privatkonto"] += sheet['D'+str(i)].value
-        if sheet['E'+str(i)].value is not None:
-            outgoing_balances["Transaktioner e-sparkonto"] += sheet['E'+str(i)].value
-        if sheet['F'+str(i)].value is not None:
-            outgoing_balances["Transaktioner Aktiekonto"] += sheet['F'+str(i)].value
-
-
     sheet["D"+str(offset_y+3)].value = "Sparkonto"
     sheet["E"+str(offset_y+3)].value = "Aktiekonto"
 
@@ -177,8 +163,6 @@ def generate_footer(sheet, offset_y):
     sheet["C"+str(offset_y+11)]="=SUM(D6:F6)"
     sheet["C"+str(offset_y+12)]="=C"+str(offset_y+10)+"-C"+str(offset_y+11)
 
-    return outgoing_balances
-
 def put_payments(sheet, payments):
     i=7
     for payment in payments:
@@ -218,7 +202,7 @@ payment_fields = {
 }
 
 cost_type_rules = {
-    CostType.INCOME: CostTypeRule('C', 'D'),
+    CostType.INCOME: CostTypeRule('D', 'C'),
     CostType.TRANSFER_SAVINGS_TO_CARD: CostTypeRule('D', 'F'),
     CostType.TRANSFER_SAVINGS_TO_STOCK: CostTypeRule('D', 'E')
 }
@@ -433,11 +417,12 @@ print(saved_data)
 wb_output = Workbook()
 
 for month_identifier in months_to_iterate:
+    print(month_identifier)
     wb_output.create_sheet(month_identifier)
     sheet_out = wb_output.get_sheet_by_name(month_identifier)
-    generate_header(sheet_out, initial_balances)
+    generate_header(sheet_out)
     put_payments(sheet_out, payments_summed[month_identifier])
-    initial_balances = generate_footer(sheet_out, 8+len(payments_summed[month_identifier]))
+    generate_footer(sheet_out, 8+len(payments_summed[month_identifier]))
 
     # Load saved data
     if "initial budget" in saved_data.keys() and len(saved_data["initial budget"]) > 0:
@@ -459,7 +444,6 @@ for month_identifier in months_to_iterate:
 
 wb_output.remove_sheet(wb_output.active)
 
-# Set budget reference to previous sheet
 for month_index in range(0, len(months_to_iterate)-1):
     sheet_1 = wb_output.get_sheet_by_name(months_to_iterate[month_index])
     sheet_2 = wb_output.get_sheet_by_name(months_to_iterate[month_index+1])
@@ -468,7 +452,12 @@ for month_index in range(0, len(months_to_iterate)-1):
     while sheet_1['B'+str(footer_y_1)].value != "Budget, ackumulerad nästa månad":
         footer_y_1+=1
 
+    # Set budget reference to previous sheet
     for c in alphabet_uppercase[3:14:1] : 
         sheet_2[c+str(4)].value="='"+months_to_iterate[month_index]+"'!"+c+str(footer_y_1)
+
+    # Set ingoing balance reference to previous sheet
+    for c in alphabet_uppercase[3:5:1] : 
+        sheet_2[c+str(5)].value="='"+months_to_iterate[month_index]+"'!"+c+str(footer_y_1-6)
 
 wb_output.save(output_filename)
