@@ -265,7 +265,7 @@ cost_type_translation_table = {
     "Telia Mobile": CostType.EXPENSE_ROUTINE,
     "CLAS OHLSON 218": CostType.EXPENSE_HOUSEHOLD,
     "APOTEK HJARTAT A": CostType.EXPENSE_HOUSEHOLD,
-    "84319530719301": CostType.TRANSFER_SAVINGS_TO_CARD,
+    #"84319530719301": CostType.TRANSFER_SAVINGS_TO_CARD,
     "84319530717529": CostType.TRANSFER_SAVINGS_TO_CARD,
     "84319531718757": CostType.TRANSFER_SAVINGS_TO_STOCK,
     "@STRAS STATIONS": CostType.EXPENSE_MISC,
@@ -338,7 +338,7 @@ for filename in input_filenames:
 
         # Read a specific cell
         payment = Payment(
-            sheet_in['C'+str(r)].value,
+            sheet_in['D'+str(r)].value,
             sheet_in['E'+str(r)].value,
         )
 
