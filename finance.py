@@ -4,7 +4,7 @@ from enum import Enum
 from openpyxl import load_workbook
 from openpyxl import Workbook
 
-#TODO: Include data from investment account
+#TODO: Initial balance per account is firt transfer + first saldo
 
 alphabet_uppercase = string.ascii_uppercase
 
@@ -204,7 +204,7 @@ payment_fields = {
 cost_type_rules = {
     CostType.INCOME: CostTypeRule('D', 'C'),
     CostType.TRANSFER_SAVINGS_TO_CARD: CostTypeRule('D', 'F'),
-    CostType.TRANSFER_SAVINGS_TO_STOCK: CostTypeRule('D', 'E')
+    CostType.TRANSFER_SAVINGS_TO_STOCK: CostTypeRule('E', 'D')
 }
 
 for field in payment_fields.keys():
