@@ -89,8 +89,8 @@ def generate_header(sheet):
     sheet["G3"].value = "Rutin"
     sheet["H3"].value = "Mat"
     sheet["I3"].value = "Hushåll"
-    sheet["J3"].value = "Hobby"
-    sheet["K3"].value = "Nöje"
+    sheet["J3"].value = "Äta ute"
+    sheet["K3"].value = "Hobby/Nöje"
     sheet["L3"].value = "Resa"
     sheet["M3"].value = "Kläder"
     sheet["N3"].value = "Övrigt"
@@ -180,7 +180,7 @@ class CostType(Enum):
     EXPENSE_FOOD=2
     EXPENSE_FUN=3
     EXPENSE_GIFTS=4
-    EXPENSE_HOBBY=5
+    EXPENSE_EAT_OUT=5
     EXPENSE_HOUSEHOLD=6
     EXPENSE_MISC=7
     EXPENSE_ROUTINE=8
@@ -193,7 +193,7 @@ payment_fields = {
     'G': CostType.EXPENSE_ROUTINE,
     'H': CostType.EXPENSE_FOOD,
     'I': CostType.EXPENSE_HOUSEHOLD,
-    'J': CostType.EXPENSE_HOBBY,
+    'J': CostType.EXPENSE_EAT_OUT,
     'K': CostType.EXPENSE_FUN,
     'L': CostType.EXPENSE_TRAVEL,
     'M': CostType.EXPENSE_CLOTHING,
@@ -219,30 +219,31 @@ cost_type_translation_table = {
     "HM SE0020": CostType.EXPENSE_CLOTHING,
     "HAIR & COSMETIC": CostType.EXPENSE_CLOTHING,
     "UNIQLO MALL OF": CostType.EXPENSE_CLOTHING,
-    "AB STORSTOCKHOL": CostType.EXPENSE_FOOD,
-    "BURGER KING ODE": CostType.EXPENSE_FOOD,
     "HEMKÖP DJURGÅRDS": CostType.EXPENSE_FOOD,
     "HEMKÖP SOLNA MAL": CostType.EXPENSE_FOOD,
     "ICA LAPPKARRSBER": CostType.EXPENSE_FOOD,
-    "RAMEN KI MAMA": CostType.EXPENSE_FOOD,
     "HEMKÖP CITY STOC": CostType.EXPENSE_FOOD,
-    "VETE-KATTEN AB": CostType.EXPENSE_FOOD,
     "MAX MALL OF SCAN": CostType.EXPENSE_FOOD,
     "ICA NARA SERGELS": CostType.EXPENSE_FOOD,
     "HIMALAYA LIVS": CostType.EXPENSE_FOOD,
     "PRESSBYRÅN 41082": CostType.EXPENSE_FOOD,
+    "STOP 22": CostType.EXPENSE_FOOD,
     "PRESSBYRÅN 42501": CostType.EXPENSE_FOOD,
     "COOP GUBBÄNGEN": CostType.EXPENSE_FOOD,
-    "926446 RESTAURAN": CostType.EXPENSE_FOOD,
-    "RESTAURANG AND P": CostType.EXPENSE_FOOD,
-    "BAGERIET I POULT": CostType.EXPENSE_FOOD,
-    "SJ AB OMBORD": CostType.EXPENSE_FOOD,
-    "PROFESSORN RESTA": CostType.EXPENSE_FUN,
-    "NON SOLO BAR ROR": CostType.EXPENSE_FUN,
+    "RAMEN KI MAMA": CostType.EXPENSE_EAT_OUT,
+    "VETE-KATTEN AB": CostType.EXPENSE_EAT_OUT,
+    "926446 RESTAURAN": CostType.EXPENSE_EAT_OUT,
+    "RESTAURANG AND P": CostType.EXPENSE_EAT_OUT,
+    "BURGER KING ODE": CostType.EXPENSE_EAT_OUT,
+    "BAGERIET I POULT": CostType.EXPENSE_EAT_OUT,
+    "SJ AB OMBORD": CostType.EXPENSE_EAT_OUT,
+    "PROFESSORN RESTA": CostType.EXPENSE_EAT_OUT,
+    "NON SOLO BAR ROR": CostType.EXPENSE_EAT_OUT,
     "PADELVERKET SPAN": CostType.EXPENSE_FUN,
     "SYSTEMBOLAGET": CostType.EXPENSE_FUN,
     "SYSTEMBOLAGET SO": CostType.EXPENSE_FUN,
     "CLAS OHLSON": CostType.EXPENSE_HOUSEHOLD,
+    "AB STORSTOCKHOL": CostType.EXPENSE_TRAVEL,
     "SL @STERMALMSTO": CostType.EXPENSE_TRAVEL,
     "FOLKTANDVÅRD": CostType.EXPENSE_ROUTINE,
     "Bostadsförmedlin": CostType.EXPENSE_ROUTINE,
