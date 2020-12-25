@@ -368,7 +368,7 @@ for filename in input_filenames:
     initial_balance = 0
     i=9
     while sheet_in['H'+str(i)].value != None:
-        initial_balance = sheet_in['H'+str(i)].value
+        initial_balance = sheet_in['H'+str(i)].value - sheet_in['G'+str(i)].value
         i+=1
     initial_balances[sheet_in["A1"].value] = initial_balance
 
