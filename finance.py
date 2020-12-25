@@ -258,6 +258,13 @@ cost_type_translation_table = {
     "LON": CostType.INCOME
 }
 
+skipped_comments = [
+        "84319530719301",
+        "ATM T UNIVERSITE",
+        "Utd TELIA",
+        "Utd ASSA B"
+        ]
+
 # Read data file names
 input_filenames = []
 for i in range(1, len(sys.argv)-1):
@@ -418,7 +425,6 @@ print(saved_data)
 wb_output = Workbook()
 
 for month_identifier in months_to_iterate:
-    print(month_identifier)
     wb_output.create_sheet(month_identifier)
     sheet_out = wb_output.get_sheet_by_name(month_identifier)
     generate_header(sheet_out)
