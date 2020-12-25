@@ -4,8 +4,6 @@ from enum import Enum
 from openpyxl import load_workbook
 from openpyxl import Workbook
 
-#TODO: Initial balance per account is firt transfer + first saldo
-
 alphabet_uppercase = string.ascii_uppercase
 
 class Payment:
@@ -197,18 +195,20 @@ payment_fields = {
     'K': CostType.EXPENSE_FUN,
     'L': CostType.EXPENSE_TRAVEL,
     'M': CostType.EXPENSE_CLOTHING,
-    'N': CostType.EXPENSE_MISC,
-    '': CostType.EXPENSE_GIFTS
+    'N': CostType.EXPENSE_MISC
+    #'': CostType.EXPENSE_GIFTS
 }
 
 cost_type_rules = {
     CostType.INCOME: CostTypeRule('D', 'C'),
-    CostType.TRANSFER_SAVINGS_TO_CARD: CostTypeRule('D', 'F'),
+    CostType.TRANSFER_SAVINGS_TO_CARD: CostTypeRule('F', 'D'),
     CostType.TRANSFER_SAVINGS_TO_STOCK: CostTypeRule('E', 'D')
 }
 
 for field in payment_fields.keys():
-    cost_type_rules[payment_fields[field]] = CostTypeRule('F', field)
+    cost_type_rules[payment_fields[field]] = CostTypeRule(field, 'F')
+
+cost_type_rules[CostType.EXPENSE_ROUTINE] = CostTypeRule('G', 'D')
 
 cost_type_translation_table = {
     "EMMAUS": CostType.EXPENSE_CLOTHING,
@@ -317,7 +317,8 @@ for filename in input_filenames:
             print("WARNING: Found payment comment that was None")
             continue
         if not comment in cost_type_translation_table:
-            print("WARNING: Did not find comment: " + str(comment) + " in cost rules, please add it. Skipping for now...")
+            if not comment in skipped_comments:
+                print("WARNING: Did not find comment: " + str(comment) + " in cost rules, please add it. Skipping for now...")
             continue
 
         # Read a specific cell
