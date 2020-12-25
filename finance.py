@@ -6,6 +6,8 @@ from openpyxl import Workbook
 
 alphabet_uppercase = string.ascii_uppercase
 
+#TODO: Föra kvitton (backup först)
+
 class Payment:
     def __init__(self, datetime, comment):
         self.datetime = datetime
@@ -62,11 +64,11 @@ class Payment:
     def similar_to(self, other):
         total_cost_1 = 0
         for letter in self.costs_per_letter.keys():
-            total_cost_1 += self.costs_per_letter[letter]
+            total_cost_1 += abs(self.costs_per_letter[letter])
 
         total_cost_2 = 0
         for letter in other.costs_per_letter.keys():
-            total_cost_2 += other.costs_per_letter[letter]
+            total_cost_2 += abs(other.costs_per_letter[letter])
 
         return self.datetime == other.datetime and self.comment == other.comment and total_cost_1 == total_cost_2
 
@@ -259,11 +261,11 @@ cost_type_translation_table = {
 }
 
 skipped_comments = [
-        "84319530719301",
-        "ATM T UNIVERSITE",
-        "Utd TELIA",
-        "Utd ASSA B"
-        ]
+    "84319530719301",
+    "ATM T UNIVERSITE",
+    "Utd TELIA",
+    "Utd ASSA B"
+]
 
 # Read data file names
 input_filenames = []
@@ -350,16 +352,14 @@ for filename in input_filenames:
         for payment_2 in payments_summed[month_identifier]:
             if payment.similar_to(payment_2):
                 similar_payment_found = True
+                print("Similar payments:")
+                print(payment.comment)
+                print(payment_2.comment)
+                print(payment.costs_per_letter)
+                print(payment_2.costs_per_letter)
                 break
         if similar_payment_found:
             continue
-
-        # Duplicate check
-        #duplicate_found = False
-        #for payment_2 in payments_summed[month_identifier]:
-        #    if payment == payment_2:
-        #        duplicate_found = True
-        #        break
 
         #if not duplicate_found:
         payments_summed[month_identifier].append(payment)
@@ -371,13 +371,6 @@ for filename in input_filenames:
         initial_balance = sheet_in['H'+str(i)].value - sheet_in['G'+str(i)].value
         i+=1
     initial_balances[sheet_in["A1"].value] = initial_balance
-
-for month in payments_summed.keys():
-    for payment in payments_summed[month]:
-        pass
-        #print("*****************")
-        #print(payment.datetime)
-        #print(payment.costs_per_letter)
 
 print(initial_balances)
 
