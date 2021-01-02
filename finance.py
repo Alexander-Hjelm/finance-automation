@@ -352,8 +352,8 @@ for filename in input_filenames:
         cost_type = cost_type_translation_table[comment]
         cost_rule = cost_type_rules[cost_type]
         cost = abs(sheet_in['G'+str(r)].value)
-        payment.set_cost(cost_rule.from_field, -cost)
-        payment.set_cost(cost_rule.to_field, cost)
+        payment.set_cost(cost_rule.from_field, cost)
+        payment.set_cost(cost_rule.to_field, -cost)
 
         month_identifier = str.rsplit(payment.datetime, '-', 1)[0]
         if not month_identifier in payments_summed:
