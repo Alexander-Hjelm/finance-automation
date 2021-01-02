@@ -148,10 +148,10 @@ def generate_footer(sheet, offset_y):
         sheet[c+str(offset_y+4)]="=SUM("+c+"4,-"+c+str(offset_y)+")"
         sheet[c+str(offset_y+5)]=0
         sheet[c+str(offset_y+6)]=0
-        sheet[c+str(offset_y+7)]="=SUM("+c+str(offset_y+4)+","+c+str(offset_y+4)+","+c+str(offset_y+6)+")"
+        sheet[c+str(offset_y+7)]="=SUM("+c+str(offset_y+4)+","+c+str(offset_y+5)+","+c+str(offset_y+6)+")"
 
-    sheet["D"+str(offset_y+7)]="=SUM(D"+str(offset_y+4)+",D"+str(offset_y+4)+",D"+str(offset_y+6)+")"
-    sheet["E"+str(offset_y+7)]="=SUM(E"+str(offset_y+4)+",E"+str(offset_y+4)+",E"+str(offset_y+6)+")"
+    sheet["D"+str(offset_y+7)]="=SUM(D"+str(offset_y+4)+",D"+str(offset_y+5)+",D"+str(offset_y+6)+")"
+    sheet["E"+str(offset_y+7)]="=SUM(E"+str(offset_y+4)+",E"+str(offset_y+5)+",E"+str(offset_y+6)+")"
 
     sheet["B"+str(offset_y+9)]="Kontroll"
     sheet["B"+str(offset_y+10)]="Utgående saldo"
