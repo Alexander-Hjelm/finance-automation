@@ -185,9 +185,10 @@ class CostType(Enum):
     EXPENSE_MISC=7
     EXPENSE_ROUTINE=8
     EXPENSE_TRAVEL=9
-    INCOME=10
-    TRANSFER_SAVINGS_TO_CARD=11
-    TRANSFER_SAVINGS_TO_STOCK=12
+    INCOME_SAVINGS_ACC=10
+    INCOME_CARD_ACC=11
+    TRANSFER_SAVINGS_TO_CARD=12
+    TRANSFER_SAVINGS_TO_STOCK=13
 
 payment_fields = {
     'G': CostType.EXPENSE_ROUTINE,
@@ -202,7 +203,8 @@ payment_fields = {
 }
 
 cost_type_rules = {
-    CostType.INCOME: CostTypeRule('D', 'C'),
+    CostType.INCOME_SAVINGS_ACC: CostTypeRule('D', 'C'),
+    CostType.INCOME_CARD_ACC: CostTypeRule('F', 'C'),
     CostType.TRANSFER_SAVINGS_TO_CARD: CostTypeRule('F', 'D'),
     CostType.TRANSFER_SAVINGS_TO_STOCK: CostTypeRule('E', 'D')
 }
@@ -229,6 +231,7 @@ cost_type_translation_table = {
     "PRESSBYRÅN 41082": CostType.EXPENSE_FOOD,
     "STOP 22": CostType.EXPENSE_FOOD,
     "PRESSBYRÅN 42501": CostType.EXPENSE_FOOD,
+    "PRESSBYRÅN 40283": CostType.EXPENSE_FOOD,
     "COOP GUBBÄNGEN": CostType.EXPENSE_FOOD,
     "RAMEN KI MAMA": CostType.EXPENSE_EAT_OUT,
     "VETE-KATTEN AB": CostType.EXPENSE_EAT_OUT,
@@ -239,26 +242,35 @@ cost_type_translation_table = {
     "SJ AB OMBORD": CostType.EXPENSE_EAT_OUT,
     "PROFESSORN RESTA": CostType.EXPENSE_EAT_OUT,
     "NON SOLO BAR ROR": CostType.EXPENSE_EAT_OUT,
+    "R ASIA RESTAURAN": CostType.EXPENSE_EAT_OUT,
+    "MAX STOCKHOLM VA": CostType.EXPENSE_EAT_OUT,
+    "FRESH&FANCY": CostType.EXPENSE_EAT_OUT,
     "PADELVERKET SPAN": CostType.EXPENSE_FUN,
     "SYSTEMBOLAGET": CostType.EXPENSE_FUN,
     "SYSTEMBOLAGET SO": CostType.EXPENSE_FUN,
     "CLAS OHLSON": CostType.EXPENSE_HOUSEHOLD,
     "AB STORSTOCKHOL": CostType.EXPENSE_TRAVEL,
     "SL @STERMALMSTO": CostType.EXPENSE_TRAVEL,
+    "SJ STOCKHOLM CEN": CostType.EXPENSE_TRAVEL,
+    "Paynova AB (publ": CostType.EXPENSE_TRAVEL,
     "FOLKTANDVÅRD": CostType.EXPENSE_ROUTINE,
     "Bostadsförmedlin": CostType.EXPENSE_ROUTINE,
     "STIFT  STOCKHOLM": CostType.EXPENSE_ROUTINE,
     "LOOPIA AB": CostType.EXPENSE_ROUTINE,
     "Telia Mobile": CostType.EXPENSE_ROUTINE,
+    "MUSESCORE PRO": CostType.EXPENSE_ROUTINE,
     "CLAS OHLSON 218": CostType.EXPENSE_HOUSEHOLD,
     "APOTEK HJARTAT A": CostType.EXPENSE_HOUSEHOLD,
+    "APOTEKET C W SCH": CostType.EXPENSE_HOUSEHOLD,
     #"84319530719301": CostType.TRANSFER_SAVINGS_TO_CARD,
     "84319530717529": CostType.TRANSFER_SAVINGS_TO_CARD,
     "84319531718757": CostType.TRANSFER_SAVINGS_TO_STOCK,
     "@STRAS STATIONS": CostType.EXPENSE_MISC,
     "KONSTNARERNAS CE": CostType.EXPENSE_MISC,
     "SVEN HORNELL AB": CostType.EXPENSE_MISC,
-    "LON": CostType.INCOME
+    "LON": CostType.INCOME_SAVINGS_ACC,
+    "GOD JUL": CostType.INCOME_SAVINGS_ACC,
+    "ARVODE SSF": CostType.INCOME_CARD_ACC,
 }
 
 skipped_comments = [
@@ -353,11 +365,6 @@ for filename in input_filenames:
         for payment_2 in payments_summed[month_identifier]:
             if payment.similar_to(payment_2):
                 similar_payment_found = True
-                print("Similar payments:")
-                print(payment.comment)
-                print(payment_2.comment)
-                print(payment.costs_per_letter)
-                print(payment_2.costs_per_letter)
                 break
         if similar_payment_found:
             continue
