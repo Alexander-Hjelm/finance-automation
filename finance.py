@@ -148,10 +148,10 @@ def generate_footer(sheet, offset_y):
         sheet[c+str(offset_y+4)]="=SUM("+c+"4,-"+c+str(offset_y)+")"
         sheet[c+str(offset_y+5)]=0
         sheet[c+str(offset_y+6)]=0
-        sheet[c+str(offset_y+7)]="=SUM("+c+str(offset_y+4)+","+c+str(offset_y+4)+",-"+c+str(offset_y+6)+")"
+        sheet[c+str(offset_y+7)]="=SUM("+c+str(offset_y+4)+","+c+str(offset_y+4)+","+c+str(offset_y+6)+")"
 
-    sheet["D"+str(offset_y+7)]="=SUM(D"+str(offset_y+4)+",D"+str(offset_y+4)+",-D"+str(offset_y+6)+")"
-    sheet["E"+str(offset_y+7)]="=SUM(E"+str(offset_y+4)+",E"+str(offset_y+4)+",-E"+str(offset_y+6)+")"
+    sheet["D"+str(offset_y+7)]="=SUM(D"+str(offset_y+4)+",D"+str(offset_y+4)+",D"+str(offset_y+6)+")"
+    sheet["E"+str(offset_y+7)]="=SUM(E"+str(offset_y+4)+",E"+str(offset_y+4)+",E"+str(offset_y+6)+")"
 
     sheet["B"+str(offset_y+9)]="Kontroll"
     sheet["B"+str(offset_y+10)]="Utgående saldo"
@@ -304,11 +304,11 @@ for sheet_name in wb_output.sheetnames:
         )
 
         # Sum cost
-        costs_per_field = {}
         for c in alphabet_uppercase[2:14:1] : 
             cost = sheet_out[c+str(r)].value
             if cost != None:
-                payment.set_cost(c, cost)
+                # NOTE: Had to use -cost here in order to avoid sign problems, not sure why
+                payment.set_cost(c, -cost)
 
         month_identifier = str.rsplit(payment.datetime, '-', 1)[0]
         if not month_identifier in payments_summed:
@@ -352,8 +352,8 @@ for filename in input_filenames:
         cost_type = cost_type_translation_table[comment]
         cost_rule = cost_type_rules[cost_type]
         cost = abs(sheet_in['G'+str(r)].value)
-        payment.set_cost(cost_rule.from_field, cost)
-        payment.set_cost(cost_rule.to_field, -cost)
+        payment.set_cost(cost_rule.from_field, -cost)
+        payment.set_cost(cost_rule.to_field, cost)
 
         month_identifier = str.rsplit(payment.datetime, '-', 1)[0]
         if not month_identifier in payments_summed:
