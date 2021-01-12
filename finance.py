@@ -188,6 +188,7 @@ class CostType(Enum):
     INCOME_CARD_ACC=11
     TRANSFER_SAVINGS_TO_CARD=12
     TRANSFER_SAVINGS_TO_STOCK=13
+    REIMBURSEMENT_FOOD=14
 
 payment_fields = {
     'G': CostType.EXPENSE_ROUTINE,
@@ -205,7 +206,8 @@ cost_type_rules = {
     CostType.INCOME_SAVINGS_ACC: CostTypeRule('D', 'C'),
     CostType.INCOME_CARD_ACC: CostTypeRule('F', 'C'),
     CostType.TRANSFER_SAVINGS_TO_CARD: CostTypeRule('F', 'D'),
-    CostType.TRANSFER_SAVINGS_TO_STOCK: CostTypeRule('E', 'D')
+    CostType.TRANSFER_SAVINGS_TO_STOCK: CostTypeRule('E', 'D'),
+    CostType.REIMBURSEMENT_FOOD: CostTypeRule('F', 'H')
 }
 
 for field in payment_fields.keys():
@@ -220,6 +222,7 @@ cost_type_translation_table = {
     "HM SE0020": CostType.EXPENSE_CLOTHING,
     "HAIR & COSMETIC": CostType.EXPENSE_CLOTHING,
     "UNIQLO MALL OF": CostType.EXPENSE_CLOTHING,
+    "NATURKOMPANIET /": CostType.EXPENSE_CLOTHING,
     "HEMKÖP DJURGÅRDS": CostType.EXPENSE_FOOD,
     "HEMKÖP SOLNA MAL": CostType.EXPENSE_FOOD,
     "ICA LAPPKARRSBER": CostType.EXPENSE_FOOD,
@@ -232,6 +235,8 @@ cost_type_translation_table = {
     "PRESSBYRÅN 42501": CostType.EXPENSE_FOOD,
     "PRESSBYRÅN 40283": CostType.EXPENSE_FOOD,
     "COOP GUBBÄNGEN": CostType.EXPENSE_FOOD,
+    "ICA NARA BERGSHA": CostType.EXPENSE_FOOD,
+    "WILLYS FRIDHEMSP": CostType.EXPENSE_FOOD,
     "RAMEN KI MAMA": CostType.EXPENSE_EAT_OUT,
     "VETE-KATTEN AB": CostType.EXPENSE_EAT_OUT,
     "926446 RESTAURAN": CostType.EXPENSE_EAT_OUT,
@@ -244,6 +249,8 @@ cost_type_translation_table = {
     "R ASIA RESTAURAN": CostType.EXPENSE_EAT_OUT,
     "MAX STOCKHOLM VA": CostType.EXPENSE_EAT_OUT,
     "FRESH&FANCY": CostType.EXPENSE_EAT_OUT,
+    "SARAVANAA INDISK": CostType.EXPENSE_EAT_OUT,
+    "BEN & JERRY": CostType.EXPENSE_EAT_OUT,
     "PADELVERKET SPAN": CostType.EXPENSE_FUN,
     "SYSTEMBOLAGET": CostType.EXPENSE_FUN,
     "SYSTEMBOLAGET SO": CostType.EXPENSE_FUN,
@@ -258,18 +265,28 @@ cost_type_translation_table = {
     "LOOPIA AB": CostType.EXPENSE_ROUTINE,
     "Telia Mobile": CostType.EXPENSE_ROUTINE,
     "MUSESCORE PRO": CostType.EXPENSE_ROUTINE,
+    "SLL Stockholms L": CostType.EXPENSE_ROUTINE,
     "CLAS OHLSON 218": CostType.EXPENSE_HOUSEHOLD,
     "APOTEK HJARTAT A": CostType.EXPENSE_HOUSEHOLD,
     "APOTEKET C W SCH": CostType.EXPENSE_HOUSEHOLD,
+    "APOTEKET SHOP": CostType.EXPENSE_HOUSEHOLD,
+    "IKEA-KUNGENS KUR": CostType.EXPENSE_HOUSEHOLD,
     #"84319530719301": CostType.TRANSFER_SAVINGS_TO_CARD,
     "84319530717529": CostType.TRANSFER_SAVINGS_TO_CARD,
     "84319531718757": CostType.TRANSFER_SAVINGS_TO_STOCK,
     "@STRAS STATIONS": CostType.EXPENSE_MISC,
     "KONSTNARERNAS CE": CostType.EXPENSE_MISC,
     "SVEN HORNELL AB": CostType.EXPENSE_MISC,
+    "WEBHALLEN": CostType.EXPENSE_MISC,
+    "PANDURO HOBBY": CostType.EXPENSE_MISC,
+    "PLANTAGEN FRESC": CostType.EXPENSE_MISC,
+    "KREATIMA": CostType.EXPENSE_MISC,
     "LON": CostType.INCOME_SAVINGS_ACC,
     "GOD JUL": CostType.INCOME_SAVINGS_ACC,
     "ARVODE SSF": CostType.INCOME_CARD_ACC,
+
+    "+46738762178": CostType.EXPENSE_FOOD,
+    "+46764134909": CostType.REIMBURSEMENT_FOOD
 }
 
 skipped_comments = [
