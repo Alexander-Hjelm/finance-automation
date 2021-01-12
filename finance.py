@@ -302,7 +302,8 @@ for i in range(1, len(sys.argv)-1):
     directory = sys.argv[i]
     for root, dirs, files in os.walk(directory, topdown=False):
         for name in files:
-            input_filenames.append(os.path.join(root, name))
+            if name.endswith(".xlsx"):
+                input_filenames.append(os.path.join(root, name))
 
 output_filename = sys.argv[-1]
 wb_output = load_workbook(output_filename)
