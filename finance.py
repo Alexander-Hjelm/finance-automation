@@ -1,12 +1,11 @@
 import sys
+import os
 import string
 from enum import Enum
 from openpyxl import load_workbook
 from openpyxl import Workbook
 
 alphabet_uppercase = string.ascii_uppercase
-
-#TODO: Föra kvitton (backup först)
 
 class Payment:
     def __init__(self, datetime, comment):
@@ -283,7 +282,10 @@ skipped_comments = [
 # Read data file names
 input_filenames = []
 for i in range(1, len(sys.argv)-1):
-    input_filenames.append(sys.argv[i])
+    directory = sys.argv[i]
+    for root, dirs, files in os.walk(directory, topdown=False):
+        for name in files:
+            input_filenames.append(os.path.join(root, name))
 
 output_filename = sys.argv[-1]
 wb_output = load_workbook(output_filename)
